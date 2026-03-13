@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Mail, Lock, ArrowRight, PieChart } from 'lucide-react';
+import libraryImage from '../../assets/Library.png'; 
+import bgImage from '../../assets/LibraryBlur.png'; 
 import '../../styles/auth.css';
 
 const Login = () => {
@@ -41,7 +43,10 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container">
+    <div className="auth-container" style={{
+        backgroundImage: `linear-gradient(rgba(10, 10, 12, 0.4), rgba(10, 10, 12, 0.6)), url(${bgImage})`,
+        backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'
+    }}>
       <header className="header no-border">
         <div className="logo"><PieChart size={28} /> CrateOn</div>
       </header>
@@ -50,7 +55,7 @@ const Login = () => {
         <div className="login-layout">
           <div className="login-hero">
             <div className="login-hero-image">
-              <span style={{ color: '#6b7280' }}>Library Image Placeholder</span>
+              <img src={libraryImage} alt="CrateOn Library Preview" className="hero-img-content"/>
             </div>
             <div className="login-hero-text">
               <h1>Level Up Your Library.</h1>

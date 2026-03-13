@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import bgImage from '../../assets/registerBG.png';
 import { User, AtSign, Lock, Rocket, PieChart } from 'lucide-react';
 import '../../styles/auth.css';
 
@@ -39,7 +40,10 @@ const Register = () => {
   };
 
   return (
-    <div className="auth-container">
+    <div className="auth-container" style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'
+    }}>
       <header className="header">
         <div className="logo"><PieChart size={28} /> CrateOn</div>
         <button className="header-btn" onClick={() => navigate('/login')}>Sign In</button>
