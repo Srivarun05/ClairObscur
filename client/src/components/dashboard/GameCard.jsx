@@ -31,7 +31,7 @@ const GameCard = ({ game, onEdit, onViewDetails, isFavorited, onToggleFavorite }
     // A lightweight tilt effect gives cards some depth without introducing a separate animation library.
     setTiltStyle({
       transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`,
-      boxShadow: `${shadowX}px ${shadowY + 20}px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.15)`,
+      boxShadow: `${shadowX}px ${shadowY + 20}px 40px var(--card-tilt-shadow), 0 0 20px var(--card-tilt-glow)`,
       transition: 'none',
       zIndex: 10
     });
@@ -67,8 +67,8 @@ const GameCard = ({ game, onEdit, onViewDetails, isFavorited, onToggleFavorite }
       >
         <Heart 
           size={16} 
-          fill={isFavorited ? '#000' : 'none'} 
-          color={isFavorited ? '#000' : '#fff'} 
+          fill={isFavorited ? 'currentColor' : 'none'} 
+          color="currentColor" 
         />
       </button>
       
@@ -85,8 +85,8 @@ const GameCard = ({ game, onEdit, onViewDetails, isFavorited, onToggleFavorite }
       <div className="card-content">
         <h3 className="card-title">{game.name}</h3>
         <p className="game-card-genre">{displayGenre}</p>        
-        <p style={{ 
-          fontSize: '13px', color: '#888', display: '-webkit-box', 
+        <p className="card-description" style={{ 
+          fontSize: '13px', display: '-webkit-box', 
           WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
         }}>
           {game.description}

@@ -157,14 +157,14 @@ const ManageUsers = () => {
                               {u.profilePic ? (
                                 <img src={getImageUrl(u.profilePic)} alt="avatar" />
                               ) : (
-                                <span style={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}>
+                                <span className="user-avatar-fallback">
                                   {(u.username || 'U')[0].toUpperCase()}
                                 </span>
                               )}
                             </div>
                             <span className="user-name">
                               {u.username} 
-                              {u._id === currentUser._id && <span style={{ color: '#666', fontSize: '12px', marginLeft: '8px' }}>(You)</span>}
+                              {u._id === currentUser._id && <span className="current-user-label">(You)</span>}
                             </span>
                           </div>
                         </td>
@@ -214,7 +214,7 @@ const ManageUsers = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                    <td colSpan="5" className="admin-empty-row">
                       No users found matching your search.
                     </td>
                   </tr>
@@ -232,11 +232,11 @@ const ManageUsers = () => {
               {actionModal.type === 'delete' ? <Trash2 size={32} color="#ef4444" /> : <ShieldAlert size={32} color="#3b82f6" />}
             </div>
             
-            <h2 style={{ color: '#fff', fontSize: '24px', marginBottom: '12px' }}>
+            <h2 className="admin-modal-title">
               {actionModal.type === 'delete' ? 'Delete User?' : 'Change Role?'}
             </h2>
             
-            <p style={{ color: '#888', marginBottom: '32px' }}>
+            <p className="admin-modal-copy">
               {actionModal.type === 'delete' 
                 ? `Are you sure you want to permanently delete "${actionModal.selectedUser?.username}"?` 
                 : `Are you sure you want to change "${actionModal.selectedUser?.username}" to a ${actionModal.selectedUser?.role === 'admin' ? 'Regular User' : 'System Admin'}?`}
@@ -245,7 +245,7 @@ const ManageUsers = () => {
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button 
                 onClick={() => setActionModal({ isOpen: false, type: '', selectedUser: null })}
-                style={{ background: '#333', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                className="admin-modal-cancel-btn"
               >
                 Cancel
               </button>
@@ -263,33 +263,33 @@ const ManageUsers = () => {
       {editModal.isOpen && (
         <div className="modal-overlay" style={{ zIndex: 2000 }} onClick={() => setEditModal({ isOpen: false, user: null, username: '', email: '' })}>
           <div className="popup-modal-content" onClick={e => e.stopPropagation()} style={{ textAlign: 'left' }}>
-            <h2 style={{ color: '#fff', fontSize: '24px', marginBottom: '24px' }}>Edit User Details</h2>
+            <h2 className="admin-modal-title edit-title">Edit User Details</h2>
             <form onSubmit={handleSaveEdit}>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', color: '#aaa', fontSize: '14px', marginBottom: '8px' }}>Username</label>
+                <label className="admin-edit-label">Username</label>
                 <input 
                   type="text" 
                   value={editModal.username}
                   onChange={(e) => setEditModal({...editModal, username: e.target.value})}
                   required
-                  style={{ width: '100%', background: '#000', border: '1px solid #333', color: '#fff', padding: '12px', borderRadius: '8px', fontSize: '14px' }}
+                  className="admin-edit-input"
                 />
               </div>
               <div style={{ marginBottom: '32px' }}>
-                <label style={{ display: 'block', color: '#aaa', fontSize: '14px', marginBottom: '8px' }}>Email Address</label>
+                <label className="admin-edit-label">Email Address</label>
                 <input 
                   type="email" 
                   value={editModal.email}
                   onChange={(e) => setEditModal({...editModal, email: e.target.value})}
                   required
-                  style={{ width: '100%', background: '#000', border: '1px solid #333', color: '#fff', padding: '12px', borderRadius: '8px', fontSize: '14px' }}
+                  className="admin-edit-input"
                 />
               </div>
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                 <button 
                   type="button"
                   onClick={() => setEditModal({ isOpen: false, user: null, username: '', email: '' })}
-                  style={{ background: '#333', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                  className="admin-modal-cancel-btn"
                 >
                   Cancel
                 </button>

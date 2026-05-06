@@ -273,7 +273,7 @@ const GameDetails = ({ isOpen, onClose, game }) => {
                   );
                 })
               ) : (
-                <p style={{ color: '#666', fontSize: '13px', fontStyle: 'italic', textAlign: 'center' }}>No comments yet. Start the discussion!</p>
+                <p className="empty-comments-text">No comments yet. Start the discussion!</p>
               )}
             </div>  
           </div>
@@ -287,13 +287,13 @@ const GameDetails = ({ isOpen, onClose, game }) => {
               <div className="modal-icon-wrapper warning">
                 <Trash2 size={32} color="#ef4444" />
               </div>
-              <h2 style={{ color: '#fff', fontSize: '24px', marginBottom: '12px' }}>Delete Comment?</h2>
-              <p style={{ color: '#888', marginBottom: '32px' }}>This action is permanent and cannot be undone.</p>
+              <h2 className="delete-modal-title">Delete Comment?</h2>
+              <p className="delete-modal-copy">This action is permanent and cannot be undone.</p>
               
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
                 <button 
                   onClick={() => setDeleteModal({ isOpen: false, commentId: null })}
-                  style={{ background: '#333', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                  className="delete-modal-cancel"
                 >
                   Cancel
                 </button>

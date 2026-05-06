@@ -55,20 +55,17 @@ const MyStatus = () => {
       <TopNav />
       <main className="dashboard-main">
         <h1 style={{ fontSize: '36px', fontWeight: '800', marginBottom: '8px' }}>My Library</h1>
-        <p style={{ color: '#888', marginBottom: '32px' }}>Track and manage your gaming journey.</p>
+        <p className="library-subtitle">Track and manage your gaming journey.</p>
 
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', borderBottom: '1px solid #333', paddingBottom: '16px', overflowX: 'auto' }}>
+        <div className="library-tabs">
           {STATUS_CATEGORIES.map(cat => (
             <button
               key={cat.id}
+              className={`library-tab ${activeTab === cat.id ? 'active' : ''}`}
               onClick={() => setActiveTab(cat.id)}
               style={{
-                display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px',
-                borderRadius: '8px', cursor: 'pointer', fontWeight: '600', border: 'none',
                 background: activeTab === cat.id ? `${cat.color}22` : 'transparent',
-                color: activeTab === cat.id ? cat.color : '#888',
-                transition: 'all 0.2s',
-                whiteSpace: 'nowrap'
+                color: activeTab === cat.id ? cat.color : undefined,
               }}
             >
               {cat.icon} {cat.id} ({statuses.filter(s => s.status === cat.id).length})
@@ -77,13 +74,13 @@ const MyStatus = () => {
         </div>
 
         {loading ? (
-          <p style={{ color: '#888' }}>Loading library...</p>
+          <p className="library-subtitle">Loading library...</p>
         ) : displayedGames.length === 0 ? (
-          <div style={{ padding: '60px', textAlign: 'center', background: '#111', borderRadius: '12px', border: '1px dashed #333' }}>
-            <p style={{ color: '#888' }}>No games in "{activeTab}" yet.</p>
+          <div className="library-empty-state">
+            <p>No games in "{activeTab}" yet.</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+          <div className="library-grid">
             
             {displayedGames.map((record) => {
               const { game, status } = record; 
@@ -91,21 +88,21 @@ const MyStatus = () => {
               if (!game) return null;
 
               return (
-                <div key={game._id} style={{ background: '#111', borderRadius: '12px', border: '1px solid #333', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <div key={game._id} className="library-card">
                   
                   <div 
+                    className="library-card-click-area"
                     onClick={() => { setSelectedRecord(record); setIsModalOpen(true); }}
-                    style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', flexGrow: 1 }}
                     title="Click to edit tracking details"
                   >
-                    <img src={getImageUrl(game.image)} alt={game.name} style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
-                    <div style={{ padding: '16px 16px 0 16px' }}>
-                      <h3 style={{ fontSize: '18px', marginBottom: '16px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{game.name}</h3>
+                    <img src={getImageUrl(game.image)} alt={game.name} className="library-card-image" />
+                    <div className="library-card-content">
+                      <h3 className="library-card-title">{game.name}</h3>
                     </div>
                   </div>
                   
-                  <div style={{ padding: '0 16px 16px 16px', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: 'auto' }}>
+                  <div className="library-card-actions">
+                    <div className="library-status-buttons">
                       {[
                         { label: 'Completed', value: 'Completed', color: '#84cc16' },
                         { label: 'Planning', value: 'Plan to Play', color: '#0ea5e9' },
@@ -117,6 +114,7 @@ const MyStatus = () => {
                         return (
                           <button
                             key={opt.value}
+                            className={`library-status-btn ${isActive ? 'active' : ''}`}
                             onClick={(e) => {
                               e.stopPropagation(); 
                               handleUpdateStatus(game._id, isActive ? '' : opt.value);
@@ -124,19 +122,9 @@ const MyStatus = () => {
                             style={{
                               flex: '1 1 auto', 
                               textAlign: 'center',
-                              
                               background: isActive ? opt.color : 'transparent',
-                              color: isActive ? '#000' : '#666',
-                              border: `1px solid ${isActive ? opt.color : '#333'}`,
-                              
-                              padding: '6px 8px',
-                              borderRadius: '6px',
-                              fontSize: '11px',
-                              fontWeight: '700',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.5px'
+                              color: isActive ? '#000' : undefined,
+                              borderColor: isActive ? opt.color : undefined,
                             }}
                             title={isActive ? "Click to remove from library" : `Move to ${opt.label}`}
                           >

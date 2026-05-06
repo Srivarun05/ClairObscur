@@ -18,10 +18,10 @@ const SubNav = ({ onOpenCreateModal, searchQuery, setSearchQuery, selectedGenre,
         {user && (
           <button 
             onClick={() => navigate('/wishlist')} 
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: location.pathname === '/wishlist' ? '#333' : 'transparent', 
-              color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: location.pathname === '/wishlist' ? 'var(--bg-hover)' : 'transparent', 
+              color: 'var(--text-main)', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
           >
-            <Heart size={16} fill={location.pathname === '/wishlist' ? '#fff' : 'none'} /> My Wishlist
+            <Heart size={16} fill={location.pathname === '/wishlist' ? 'currentColor' : 'none'} /> My Wishlist
           </button>
         )}
 
@@ -29,10 +29,10 @@ const SubNav = ({ onOpenCreateModal, searchQuery, setSearchQuery, selectedGenre,
           <button 
             className="admin-action-btn" 
             onClick={() => navigate('/status')}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: location.pathname === '/status' ? '#333' : 'transparent', 
-              color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }} 
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: location.pathname === '/status' ? 'var(--bg-hover)' : 'transparent', 
+              color: 'var(--text-main)', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }} 
           >
-            <Library size={16} fill={location.pathname === '/status' ? '#fff' : 'none'}/> My Library
+            <Library size={16} fill={location.pathname === '/status' ? 'currentColor' : 'none'}/> My Library
           </button>
         )}
 

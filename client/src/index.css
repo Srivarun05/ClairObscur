@@ -1,0 +1,788 @@
+:root {
+  --bg-main: #000000;
+  --bg-card: #111111;
+  --bg-hover: #1a1a1a;
+  --bg-soft: #0a0a0a;
+  --bg-input: #111111;
+  --border-color: #333333;
+  --text-main: #ffffff;
+  --text-soft: #e5e7eb;
+  --text-muted: #888888;
+  --accent-color: #d4d4d4;
+  --accent-text: #000000;
+  --card-tilt-shadow: rgba(0, 0, 0, 0.9);
+  --card-tilt-glow: rgba(255, 255, 255, 0.15);
+  --shadow-color: rgba(0, 0, 0, 0.65);
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg-main: #d4d4d4;
+  --bg-card: #c7c7c7;
+  --bg-hover: #b8b8b8;
+  --bg-soft: #bfbfbf;
+  --bg-input: #dcdcdc;
+  --border-color: #9f9f9f;
+  --text-main: #181818;
+  --text-soft: #262626;
+  --text-muted: #555555;
+  --accent-color: #3a3a3a;
+  --accent-text: #f2f2f2;
+  --card-tilt-shadow: rgba(74, 74, 74, 0.35);
+  --card-tilt-glow: rgba(255, 255, 255, 0.25);
+  --shadow-color: rgba(80, 80, 80, 0.22);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+body[data-theme] .steam-dashboard,
+body[data-theme] .global-header,
+body[data-theme] .global-footer {
+  background-color: var(--bg-main);
+  color: var(--text-soft);
+}
+
+body[data-theme] .global-header,
+body[data-theme] .sub-header,
+body[data-theme] .global-footer,
+body[data-theme] .footer-content,
+body[data-theme] .mobile-menu-header {
+  border-color: var(--border-color);
+}
+
+body[data-theme] .brand-logo,
+body[data-theme] .footer-brand,
+body[data-theme] .section-header,
+body[data-theme] .card-title,
+body[data-theme] .toggle-label,
+body[data-theme] .file-name,
+body[data-theme] .modal-header h2 {
+  color: var(--text-main);
+}
+
+body[data-theme] .main-nav-link,
+body[data-theme] .sub-link,
+body[data-theme] .action-icon,
+body[data-theme] .footer-links a,
+body[data-theme] .footer-socials a,
+body[data-theme] .card-status,
+body[data-theme] .card-description,
+body[data-theme] .modal-header p,
+body[data-theme] .modal-form label,
+body[data-theme] .toggle-desc,
+body[data-theme] .file-size,
+body[data-theme] .game-card-genre,
+body[data-theme] .search-icon,
+body[data-theme] .filter-icon,
+body[data-theme] .close-btn,
+body[data-theme] .close-menu-btn {
+  color: var(--text-muted);
+}
+
+body[data-theme] .main-nav-link:hover,
+body[data-theme] .main-nav-link.active,
+body[data-theme] .sub-link:hover,
+body[data-theme] .sub-link.active,
+body[data-theme] .action-icon:hover,
+body[data-theme] .footer-links a:hover,
+body[data-theme] .footer-socials a:hover,
+body[data-theme] .close-btn:hover,
+body[data-theme] .close-menu-btn:hover {
+  color: var(--text-main);
+}
+
+body[data-theme] .main-nav-link::after,
+body[data-theme] .sub-link::after,
+body[data-theme] .user-profile-btn::after {
+  background-color: var(--accent-color);
+}
+
+body[data-theme] .user-profile-btn,
+body[data-theme] .game-card,
+body[data-theme] .modal-content,
+body[data-theme] .modal-content.large,
+body[data-theme] .toggle-container,
+body[data-theme] .file-preview-card,
+body[data-theme] .filter-dropdown-wrapper,
+body[data-theme] .footer-socials a {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .game-card {
+  background-color: var(--bg-card);
+}
+
+body[data-theme] .user-profile-btn:hover,
+body[data-theme] .mobile-menu-links button:hover,
+body[data-theme] .footer-socials a:hover,
+body[data-theme] .genre-checkbox-item:hover,
+body[data-theme] .btn-cancel:hover {
+  background: var(--bg-hover);
+}
+
+body[data-theme] .sub-header,
+body[data-theme] .mobile-slide-menu,
+body[data-theme] .admin-zone,
+body[data-theme] .genre-checkbox-grid,
+body[data-theme] .upload-zone,
+body[data-theme] .card-image-wrapper {
+  background: var(--bg-soft);
+  border-color: var(--border-color);
+}
+
+body[data-theme] .search-input,
+body[data-theme] .genre-filter,
+body[data-theme] .icon-select,
+body[data-theme] .modal-form input,
+body[data-theme] .modal-form textarea,
+body[data-theme] .modal-form select {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .search-input:focus,
+body[data-theme] .genre-filter:focus,
+body[data-theme] .filter-dropdown-wrapper:hover,
+body[data-theme] .modal-form input:focus,
+body[data-theme] .modal-form textarea:focus,
+body[data-theme] .modal-form select:focus {
+  border-color: var(--accent-color);
+}
+
+body[data-theme] .section-line,
+body[data-theme] .status-badge,
+body[data-theme] .page-btn {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+  color: var(--text-muted);
+}
+
+body[data-theme] .page-btn:hover:not(:disabled),
+body[data-theme] .page-btn.active,
+body[data-theme] .btn-primary,
+body[data-theme] .btn-save,
+body[data-theme] .hero-btn,
+body[data-theme] .hero-tag,
+body[data-theme] .genre-pill.active,
+body[data-theme] .admin-action-btn:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--accent-text);
+}
+
+body[data-theme] .admin-action-btn,
+body[data-theme] .btn-cancel,
+body[data-theme] .genre-pill,
+body[data-theme] .upload-zone,
+body[data-theme] .page-btn {
+  border-color: var(--border-color);
+}
+
+body[data-theme] .game-card:hover {
+  border-color: var(--accent-color);
+  box-shadow: inset 0 0 0 1px var(--accent-color);
+}
+
+body[data-theme] .hero-banner {
+  border-color: var(--border-color);
+  box-shadow: inset 0 0 50px var(--shadow-color);
+}
+
+body[data-theme] .nav-avatar-img,
+body[data-theme] .file-thumbnail {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+}
+
+body[data-theme] .favorite-btn,
+body[data-theme] .edit-btn {
+  background: color-mix(in srgb, var(--bg-main) 76%, transparent);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .favorite-btn:hover,
+body[data-theme] .edit-btn:hover,
+body[data-theme] .favorite-btn.favorited {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--accent-text);
+}
+
+body[data-theme] .icon-select option {
+  background: var(--bg-input);
+  color: var(--text-main);
+}
+
+body[data-theme] .details-modal-content {
+  background-color: var(--bg-main);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .details-image-section {
+  background: var(--bg-soft);
+}
+
+body[data-theme] .details-info-section {
+  background: var(--bg-main);
+}
+
+body[data-theme] .details-info-section::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+}
+
+body[data-theme] .details-title,
+body[data-theme] .comments-header,
+body[data-theme] .comment-user,
+body[data-theme] .rating-average,
+body[data-theme] .delete-modal-title {
+  color: var(--text-main);
+}
+
+body[data-theme] .details-desc,
+body[data-theme] .comment-text,
+body[data-theme] .rating-count,
+body[data-theme] .status-label,
+body[data-theme] .empty-comments-text,
+body[data-theme] .delete-modal-copy {
+  color: var(--text-muted);
+}
+
+body[data-theme] .details-genre,
+body[data-theme] .rating-container,
+body[data-theme] .comment-item,
+body[data-theme] .popup-modal-content {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .comments-container {
+  border-color: var(--border-color);
+}
+
+body[data-theme] .comment-input-box input,
+body[data-theme] .inline-edit-input,
+body[data-theme] .admin-edit-comment-box input {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .comment-input-box input:focus,
+body[data-theme] .inline-edit-input:focus,
+body[data-theme] .admin-edit-comment-box input:focus {
+  border-color: var(--accent-color);
+}
+
+body[data-theme] .comment-input-box button,
+body[data-theme] .delete-modal-cancel {
+  background: var(--accent-color);
+  color: var(--accent-text);
+}
+
+body[data-theme] .comment-input-box button:disabled {
+  background: var(--bg-hover);
+  color: var(--text-muted);
+}
+
+body[data-theme] .details-close-btn {
+  background: color-mix(in srgb, var(--bg-main) 70%, transparent);
+  color: var(--text-main);
+}
+
+body[data-theme] .details-close-btn:hover,
+body[data-theme] .comment-actions .comment-edit-btn:hover,
+body[data-theme] .inline-cancel-btn,
+body[data-theme] .btn-cancel-comment {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+body[data-theme] .comment-actions button,
+body[data-theme] .clear-rating-btn,
+body[data-theme] .admin-comment-controls button {
+  color: var(--text-muted);
+}
+
+body[data-theme] .status-pill {
+  background: var(--bg-card);
+}
+
+body[data-theme] .empty-comments-text {
+  font-size: 13px;
+  font-style: italic;
+  text-align: center;
+}
+
+body[data-theme] .delete-modal-title {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+body[data-theme] .delete-modal-copy {
+  margin-bottom: 32px;
+}
+
+body[data-theme] .delete-modal-cancel {
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+body[data-theme] .profile-modal-content {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  box-shadow: 0 20px 60px var(--shadow-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .profile-header {
+  color: var(--text-main);
+}
+
+body[data-theme] .close-modal-btn,
+body[data-theme] .profile-input-icon {
+  color: var(--text-muted);
+}
+
+body[data-theme] .close-modal-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+body[data-theme] .profile-pic-preview {
+  background: var(--bg-hover);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent-color) 30%, transparent);
+}
+
+body[data-theme] .upload-btn {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .upload-btn:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--accent-text);
+}
+
+body[data-theme] .form-group label {
+  color: var(--text-muted);
+}
+
+body[data-theme] .form-group input,
+body[data-theme] .profile-input-wrapper input {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .form-group input:focus,
+body[data-theme] .profile-input-wrapper input:focus {
+  background: var(--bg-hover);
+  border-color: var(--accent-color);
+  box-shadow: 0 8px 20px var(--shadow-color), 0 0 0 2px color-mix(in srgb, var(--accent-color) 18%, transparent);
+}
+
+body[data-theme] .profile-input-wrapper input:focus + .profile-input-icon,
+body[data-theme] .profile-input-wrapper:hover .profile-input-icon {
+  color: var(--text-main);
+  filter: none;
+}
+
+body[data-theme] .disabled-input {
+  background: var(--bg-soft) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-muted) !important;
+}
+
+body[data-theme] .save-profile-btn {
+  background: var(--accent-color);
+  color: var(--accent-text);
+  box-shadow: 0 4px 14px var(--shadow-color);
+}
+
+body[data-theme] .save-profile-btn:hover:not(:disabled) {
+  background: var(--text-main);
+  color: var(--bg-main);
+}
+
+body[data-theme] .save-profile-btn:disabled {
+  background: var(--bg-hover);
+  color: var(--text-muted);
+}
+
+body[data-theme] .admin-table-container,
+body[data-theme] .stat-card,
+body[data-theme] .action-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+body[data-theme] .admin-table th {
+  background: var(--bg-soft);
+  border-color: var(--border-color);
+  color: var(--text-muted);
+}
+
+body[data-theme] .admin-table td {
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .admin-table tbody tr:hover,
+body[data-theme] .action-card:hover {
+  background: var(--bg-hover);
+}
+
+body[data-theme] .text-muted,
+body[data-theme] .admin-header p,
+body[data-theme] .stat-info h3,
+body[data-theme] .action-text p,
+body[data-theme] .action-arrow,
+body[data-theme] .current-user-label,
+body[data-theme] .admin-modal-copy,
+body[data-theme] .admin-edit-label {
+  color: var(--text-muted) !important;
+}
+
+body[data-theme] .admin-header,
+body[data-theme] .admin-empty-row {
+  border-color: var(--border-color);
+}
+
+body[data-theme] .admin-empty-row {
+  color: var(--text-muted);
+  padding: 40px;
+  text-align: center;
+}
+
+body[data-theme] .user-avatar {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+}
+
+body[data-theme] .user-avatar-fallback {
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+body[data-theme] .current-user-label {
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+body[data-theme] .user-name,
+body[data-theme] .stat-info h2,
+body[data-theme] .section-title,
+body[data-theme] .action-text h3,
+body[data-theme] .admin-modal-title {
+  color: var(--text-main);
+}
+
+body[data-theme] .role-badge.user {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .modal-icon-wrapper,
+body[data-theme] .stat-icon,
+body[data-theme] .action-icon-wrapper {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .action-card:hover .action-icon-wrapper {
+  background: var(--accent-color);
+  color: var(--accent-text);
+}
+
+body[data-theme] .action-card:hover .action-icon-wrapper svg {
+  stroke: var(--accent-text);
+}
+
+body[data-theme] .action-card:hover .action-arrow,
+body[data-theme] .admin-back-btn:hover {
+  color: var(--text-main);
+}
+
+body[data-theme] .admin-back-btn,
+body[data-theme] .edit-user-btn,
+body[data-theme] .delete-user-btn {
+  color: var(--text-muted);
+}
+
+body[data-theme] .admin-modal-title {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+body[data-theme] .admin-modal-title.edit-title {
+  margin-bottom: 24px;
+}
+
+body[data-theme] .admin-modal-copy {
+  margin-bottom: 32px;
+}
+
+body[data-theme] .admin-modal-cancel-btn {
+  background: var(--bg-hover);
+  color: var(--text-main);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+body[data-theme] .admin-edit-label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+body[data-theme] .admin-edit-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+body[data-theme] .admin-edit-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+body[data-theme] .tracker-modal-content {
+  background: var(--bg-main);
+  border-color: var(--border-color);
+  box-shadow: 0 25px 50px -12px var(--shadow-color);
+}
+
+body[data-theme] .tracker-hero {
+  border-color: var(--border-color);
+}
+
+body[data-theme] .tracker-hero-overlay {
+  background: linear-gradient(to top, var(--bg-main) 5%, color-mix(in srgb, var(--bg-main) 58%, transparent) 52%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+body[data-theme] .tracker-cover {
+  border-color: var(--bg-main);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+body[data-theme] .tracker-title,
+body[data-theme] .tracker-group label {
+  color: var(--text-main);
+}
+
+body[data-theme] .tracker-close-btn {
+  background: color-mix(in srgb, var(--bg-main) 70%, transparent);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .tracker-close-btn:hover {
+  background: var(--bg-hover);
+}
+
+body[data-theme] .tracker-save-top-btn {
+  background: var(--accent-color);
+  color: var(--accent-text);
+}
+
+body[data-theme] .tracker-save-top-btn:hover {
+  background: var(--text-main);
+  color: var(--bg-main);
+}
+
+body[data-theme] .tracker-group input,
+body[data-theme] .tracker-group select,
+body[data-theme] .tracker-group textarea {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme] .tracker-group input:focus,
+body[data-theme] .tracker-group select:focus,
+body[data-theme] .tracker-group textarea:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 18%, transparent);
+}
+
+body[data-theme] .library-subtitle {
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+body[data-theme] .library-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+  overflow-x: auto;
+}
+
+body[data-theme] .library-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  border: none;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+body[data-theme] .library-tab:not(.active):hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+body[data-theme] .library-empty-state {
+  padding: 60px;
+  text-align: center;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px dashed var(--border-color);
+  color: var(--text-muted);
+}
+
+body[data-theme] .library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+body[data-theme] .library-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  color: var(--text-main);
+}
+
+body[data-theme] .library-card:hover {
+  border-color: var(--accent-color);
+}
+
+body[data-theme] .library-card-click-area {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+body[data-theme] .library-card-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+body[data-theme] .library-card-content {
+  padding: 16px 16px 0 16px;
+}
+
+body[data-theme] .library-card-title {
+  color: var(--text-main);
+  font-size: 18px;
+  margin-bottom: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body[data-theme] .library-card-actions {
+  padding: 0 16px 16px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+body[data-theme] .library-status-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+body[data-theme] .library-status-btn {
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+body[data-theme] .library-status-btn:not(.active):hover {
+  background: var(--bg-hover) !important;
+  color: var(--text-main);
+}
+
+body[data-theme] .theme-toggle-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+body[data-theme] .admin-action-btn,
+body[data-theme] .mobile-menu-links button,
+body[data-theme] .logout-mobile-btn {
+  background: transparent;
+  color: var(--text-main);
+}
+
+body[data-theme] .mobile-menu-links button.active {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}

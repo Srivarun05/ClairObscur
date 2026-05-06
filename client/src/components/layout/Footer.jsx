@@ -21,7 +21,7 @@ const Footer = () => {
           style={{ cursor: 'pointer' }} 
           title="Back to top"
         >
-          <PieChart size={24} color="#ffffff" />
+          <PieChart size={24} color="currentColor" />
           <span>CrateOn</span>
         </div>
         
