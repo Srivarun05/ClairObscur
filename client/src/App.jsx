@@ -14,6 +14,7 @@ const Wishlist = lazy(() => import('./pages/dashboard/Wishlist'));
 const MyStatus = lazy(() => import('./pages/dashboard/MyStatus'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const ManageUsers = lazy(() => import('./pages/admin/ManageUsers'));
+const AdminUserLibrary = lazy(() => import('./pages/admin/AdminUserLibrary'));
 
 // Shared suspense fallback so route-level lazy loading still feels intentional.
 const PageLoader = () => (
@@ -90,6 +91,7 @@ function App() {
               {/* Admin routes are grouped under a stricter role gate. */}
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/users" element={<ManageUsers />} />
+              <Route path="/admin/users/:userId/library" element={<AdminUserLibrary />} />
             </Route> 
 
           </Routes> 

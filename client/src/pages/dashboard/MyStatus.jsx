@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Api from '../../Api';
 import TopNav from '../../components/layout/TopNav';
-import { Play, Calendar, CheckCircle, Pause, XCircle } from 'lucide-react';
+import { Play, Calendar, CheckCircle, Pause, XCircle, BarChart3, Target } from 'lucide-react';
 import { getImageUrl } from '../../config';
 import LibraryEditModal from '../../components/dashboard/LibraryEditModal'; 
 
@@ -15,8 +15,10 @@ const STATUS_CATEGORIES = [
 
 const MyStatus = () => {
   const [statuses, setStatuses] = useState([]);
+  const [totalGames, setTotalGames] = useState(0);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Playing');
+  const [hoveredSegment, setHoveredSegment] = useState(null);
 
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,8 +26,12 @@ const MyStatus = () => {
   const fetchLibrary = async () => {
     try {
       // Each status record includes both the game and the user's tracking metadata for that game.
-      const response = await Api.get('/status');
-      setStatuses((response.data.data || []).filter(record => record.game));
+      const [statusResponse, gamesResponse] = await Promise.all([
+        Api.get('/status'),
+        Api.get('/games')
+      ]);
+      setStatuses((statusResponse.data.data || []).filter(record => record.game));
+      setTotalGames((gamesResponse.data.data || gamesResponse.data || []).length);
     } catch (error) {
       console.error("Failed to load library");
     } finally {
@@ -50,12 +56,114 @@ const MyStatus = () => {
   const displayedGames = statuses.filter(s => s.status === activeTab);
   // Tabs are rendered from the same source of truth used for filtering so counts never drift.
 
+  const totalTracked = statuses.length;
+  const playingCount = statuses.filter(s => s.status === 'Playing').length;
+
+  const statusCounts = STATUS_CATEGORIES.map(category => ({
+    ...category,
+    count: statuses.filter(s => s.status === category.id).length
+  }));
+
+  const donutRadius = 44;
+  const donutCircumference = 2 * Math.PI * donutRadius;
+  let donutOffset = 0;
+  const donutSegments = statusCounts
+    .filter(category => category.count > 0 && totalTracked > 0)
+    .map(category => {
+      const segmentLength = (category.count / totalTracked) * donutCircumference;
+      const segment = {
+        ...category,
+        dashArray: `${segmentLength} ${donutCircumference - segmentLength}`,
+        dashOffset: -donutOffset
+      };
+      donutOffset += segmentLength;
+      return segment;
+    });
+
+  const playingPreview = statuses
+    .filter(s => s.status === 'Playing')
+    .slice(0, 2)
+    .map(s => s.game?.name)
+    .filter(Boolean)
+    .join(', ');
+
+  const activeDonutMetric = hoveredSegment || { count: totalTracked, id: 'Total', color: 'var(--text-main)' };
+
   return (
     <div className="steam-dashboard">
       <TopNav />
       <main className="dashboard-main">
         <h1 style={{ fontSize: '36px', fontWeight: '800', marginBottom: '8px' }}>My Library</h1>
         <p className="library-subtitle">Track and manage your gaming journey.</p>
+
+        <section className="library-analytics-panel">
+          <div className="library-stat-card">
+            <div className="library-stat-icon">
+              <BarChart3 size={22} />
+            </div>
+            <div>
+              <p className="library-stat-label">Total / Tracked Games</p>
+              <h2 className="library-stat-value">{totalGames}/{totalTracked}</h2>
+            </div>
+          </div>
+
+          <div className="library-stat-card">
+            <div className="library-stat-icon">
+              <Target size={22} />
+            </div>
+            <div>
+              <p className="library-stat-label">Currently Playing</p>
+              <h2 className="library-stat-value">{playingCount}</h2>
+              {playingPreview && <p className="library-stat-note">{playingPreview}</p>}
+            </div>
+          </div>
+
+          <div className="library-donut-card">
+            <div className="library-donut-chart">
+              <svg className="library-donut-svg" viewBox="0 0 120 120" role="img" aria-label="Library status breakdown">
+                <circle className="library-donut-track" cx="60" cy="60" r={donutRadius} />
+                {donutSegments.map(segment => (
+                  <circle
+                    key={segment.id}
+                    className="library-donut-segment"
+                    cx="60"
+                    cy="60"
+                    r={donutRadius}
+                    stroke={segment.color}
+                    strokeDasharray={segment.dashArray}
+                    strokeDashoffset={segment.dashOffset}
+                    onMouseEnter={() => setHoveredSegment(segment)}
+                    onMouseLeave={() => setHoveredSegment(null)}
+                    onFocus={() => setHoveredSegment(segment)}
+                    onBlur={() => setHoveredSegment(null)}
+                    onClick={() => setActiveTab(segment.id)}
+                  />
+                ))}
+              </svg>
+              <div className="library-donut-center">
+                <span style={{ color: activeDonutMetric.color }}>{activeDonutMetric.count}</span>
+                <small>{activeDonutMetric.id}</small>
+              </div>
+            </div>
+            <div className="library-donut-meta">
+              <p className="library-stat-label">Breakdown</p>
+              <div className="library-donut-legend">
+                {statusCounts.map(category => (
+                  <button
+                    key={category.id}
+                    className="library-legend-item"
+                    onClick={() => setActiveTab(category.id)}
+                    type="button"
+                  >
+                    <span style={{ background: category.color }} />
+                    {category.id}
+                    <strong>{category.count}</strong>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
 
         <div className="library-tabs">
           {STATUS_CATEGORIES.map(cat => (

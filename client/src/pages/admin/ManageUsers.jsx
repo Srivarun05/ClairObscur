@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Trash2, Shield, User, ArrowLeft, ShieldAlert, Edit2 } from 'lucide-react';
+import { Search, Trash2, Shield, User, ArrowLeft, ShieldAlert, Edit2, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Api from '../../Api';
@@ -188,6 +188,14 @@ const ManageUsers = () => {
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                            <button
+                              className="view-library-btn"
+                              onClick={() => navigate(`/admin/users/${u._id}/library`)}
+                              title="Open Library Override"
+                            >
+                              <BookOpen size={16} />
+                            </button>
+
                             <button 
                               className="edit-user-btn" 
                               onClick={() => handleEditUserClick(u)}
