@@ -265,3 +265,13 @@
     font-size: 15px;
   }
 }
+
+.profile-visibility-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 15px;
+}

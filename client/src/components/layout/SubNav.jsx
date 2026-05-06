@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, Users, Heart, Filter, X, Library } from 'lucide-react'; 
+import { Search, Plus, Users, Heart, Filter, X, Library, UserPlus } from 'lucide-react'; 
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -22,6 +22,16 @@ const SubNav = ({ onOpenCreateModal, searchQuery, setSearchQuery, selectedGenre,
               color: 'var(--text-main)', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
           >
             <Heart size={16} fill={location.pathname === '/wishlist' ? 'currentColor' : 'none'} /> My Wishlist
+          </button>
+        )}
+
+        {user && (
+          <button
+            onClick={() => navigate('/people')}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: location.pathname === '/people' ? 'var(--bg-hover)' : 'transparent',
+              color: 'var(--text-main)', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            <UserPlus size={16} /> People
           </button>
         )}
 

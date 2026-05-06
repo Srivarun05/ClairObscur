@@ -12,9 +12,12 @@ const Register = lazy(() => import('./pages/auth/Register'));
 const Home = lazy(() => import('./pages/dashboard/Home'));
 const Wishlist = lazy(() => import('./pages/dashboard/Wishlist'));
 const MyStatus = lazy(() => import('./pages/dashboard/MyStatus'));
+const People = lazy(() => import('./pages/social/People'));
+const PublicProfile = lazy(() => import('./pages/social/PublicProfile'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const ManageUsers = lazy(() => import('./pages/admin/ManageUsers'));
 const AdminUserLibrary = lazy(() => import('./pages/admin/AdminUserLibrary'));
+const AdminSocial = lazy(() => import('./pages/admin/AdminSocial'));
 
 // Shared suspense fallback so route-level lazy loading still feels intentional.
 const PageLoader = () => (
@@ -84,6 +87,8 @@ function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/status" element={<MyStatus />} />
+              <Route path="/people" element={<People />} />
+              <Route path="/profile/:userId" element={<PublicProfile />} />
               {/* <Route path="/game/:id" element={<GameDetails />} /> */}
             </Route>
 
@@ -92,6 +97,7 @@ function App() {
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/users" element={<ManageUsers />} />
               <Route path="/admin/users/:userId/library" element={<AdminUserLibrary />} />
+              <Route path="/admin/social" element={<AdminSocial />} />
             </Route> 
 
           </Routes> 

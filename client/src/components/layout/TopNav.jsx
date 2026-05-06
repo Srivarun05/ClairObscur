@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect, useRef } from 'react'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { PieChart, User as UserIcon, LogOut, Menu, X, Heart, Library, Shield, Plus, Users, Sun, Moon } from 'lucide-react';
+import { PieChart, User as UserIcon, LogOut, Menu, X, Heart, Library, Shield, Plus, Users, Sun, Moon, Bell } from 'lucide-react';
 import UserProfileModal from '../dashboard/UserProfileModal'; 
+import Api from '../../Api';
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
@@ -17,6 +18,9 @@ const TopNav = ({ onOpenCreateModal }) => {
   
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const notificationRef = useRef(null);
 
   const [theme, setTheme] = useState(() => localStorage.getItem('crateon-theme') || 'dark');
 
@@ -29,6 +33,57 @@ const TopNav = ({ onOpenCreateModal }) => {
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
   };
+
+  useEffect(() => {
+    if (!user) return;
+
+    const loadNotifications = async () => {
+      try {
+        const response = await Api.get('/social/notifications');
+        setNotifications(response.data.data || []);
+      } catch (error) {
+        setNotifications([]);
+      }
+    };
+
+    loadNotifications();
+  }, [user]);
+
+  const unreadCount = notifications.filter(notification => !notification.isRead).length;
+
+  const toggleNotifications = async () => {
+    setIsNotificationsOpen(prev => !prev);
+    if (unreadCount > 0) {
+      try {
+        await Api.put('/social/notifications/read');
+        setNotifications(prev => prev.map(notification => ({ ...notification, isRead: true })));
+        window.setTimeout(() => {
+          setNotifications(prev => prev.filter(notification => !notification.isRead));
+          setIsNotificationsOpen(false);
+        }, 5000);
+      } catch (error) {
+        console.error('Failed to mark notifications read', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isNotificationsOpen) return;
+
+    const handleOutsideClick = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setIsNotificationsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('touchstart', handleOutsideClick);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
+  }, [isNotificationsOpen]);
 
   const handleLogout = () => {
     logout();
@@ -71,6 +126,35 @@ const TopNav = ({ onOpenCreateModal }) => {
         </div>
 
         <div className="header-right">
+          <div className="notification-wrapper desktop-only" ref={notificationRef}>
+            <button
+              type="button"
+              className="action-icon theme-toggle-btn notification-toggle-btn"
+              onClick={toggleNotifications}
+              title="Notifications"
+              aria-label="Notifications"
+              style={{ cursor: 'pointer', color: 'var(--text-muted)' }}
+            >
+              <Bell size={19} />
+              {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
+            </button>
+
+            {isNotificationsOpen && (
+              <div className="notification-popover">
+                <div className="notification-popover-title">Notifications</div>
+                {notifications.length === 0 ? (
+                  <p>No notifications yet.</p>
+                ) : (
+                  notifications.slice(0, 8).map(notification => (
+                    <div className="notification-item" key={notification._id}>
+                      {notification.message}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+
           <button
             type="button"
             className="action-icon theme-toggle-btn desktop-only"
@@ -130,6 +214,26 @@ const TopNav = ({ onOpenCreateModal }) => {
             )}
             <span>{user?.username ? user.username : 'My Profile'}</span>
           </button>
+
+          <button
+            type="button"
+            onClick={toggleNotifications}
+            style={{ color: 'var(--text-muted)' }}
+          >
+            <Bell size={18} /> Notifications {unreadCount > 0 ? `(${unreadCount})` : ''}
+          </button>
+
+          {isNotificationsOpen && (
+            <div className="mobile-notification-list">
+              {notifications.length === 0 ? (
+                <p>No notifications yet.</p>
+              ) : (
+                notifications.slice(0, 5).map(notification => (
+                  <p key={notification._id}>{notification.message}</p>
+                ))
+              )}
+            </div>
+          )}
 
           <button
             type="button"

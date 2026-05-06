@@ -27,6 +27,16 @@ const userSchema = mongoose.Schema({
     profilePic: {
         type: String,
         default: "" 
+    },
+    profileVisibility: {
+        type: String,
+        enum: ["public", "private"],
+        default: "public"
+    },
+    accountStatus: {
+        type: String,
+        enum: ["active", "blocked"],
+        default: "active"
     }
 }, { timestamps: true });
 

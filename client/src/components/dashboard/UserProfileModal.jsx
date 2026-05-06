@@ -10,6 +10,7 @@ const UserProfileModal = ({ isOpen, onClose }) => {
   
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [profileVisibility, setProfileVisibility] = useState('public');
   const [profilePic, setProfilePic] = useState(null);
   const [previewImage, setPreviewImage] = useState('');
   
@@ -29,6 +30,7 @@ const UserProfileModal = ({ isOpen, onClose }) => {
       const userData = response.data.data;
       setUsername(userData.username);
       setEmail(userData.email);
+      setProfileVisibility(userData.profileVisibility || 'public');
       if (userData.profilePic) {
         setPreviewImage(getImageUrl(userData.profilePic));
       }
@@ -53,6 +55,7 @@ const UserProfileModal = ({ isOpen, onClose }) => {
 
     const formData = new FormData();
     formData.append('username', username);
+    formData.append('profileVisibility', profileVisibility);
     if (profilePic) {
       formData.append('profilePic', profilePic);
     }
@@ -136,6 +139,19 @@ const UserProfileModal = ({ isOpen, onClose }) => {
               className="disabled-input"
               title="Email cannot be changed"
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="visibility-input">Profile Visibility</label>
+            <select
+              id="visibility-input"
+              value={profileVisibility}
+              onChange={(e) => setProfileVisibility(e.target.value)}
+              className="profile-visibility-select"
+            >
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+            </select>
           </div>
 
           <button type="submit" className="save-profile-btn" disabled={isLoading}>

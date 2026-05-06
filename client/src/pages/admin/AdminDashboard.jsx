@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Gamepad2, Plus, ShieldAlert, Activity, ArrowRight } from 'lucide-react';
+import { Users, Gamepad2, Plus, ShieldAlert, Activity, ArrowRight, Network } from 'lucide-react';
 import Api from '../../Api';
 import TopNav from '../../components/layout/TopNav';
 import GameModal from '../../components/dashboard/GameModal';
@@ -96,6 +96,15 @@ const AdminDashboard = () => {
             <div className="action-text">
               <h3>Manage Users</h3>
               <p>View, edit, or remove user accounts.</p>
+            </div>
+            <ArrowRight className="action-arrow" size={20} />
+          </div>
+
+          <div className="action-card" onClick={() => navigate('/admin/social')}>
+            <div className="action-icon-wrapper"><Network size={32} color="#fff" /></div>
+            <div className="action-text">
+              <h3>Social Oversight</h3>
+              <p>Inspect follows, requests, reports, and account risk.</p>
             </div>
             <ArrowRight className="action-arrow" size={20} />
           </div>

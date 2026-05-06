@@ -16,7 +16,7 @@ const ManageUsers = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const [actionModal, setActionModal] = useState({ isOpen: false, type: '', selectedUser: null });
-  const [editModal, setEditModal] = useState({ isOpen: false, user: null, username: '', email: '' });
+  const [editModal, setEditModal] = useState({ isOpen: false, user: null, username: '', email: '', profileVisibility: 'public', accountStatus: 'active' });
 
   const fetchUsers = async () => {
     try {
@@ -64,7 +64,9 @@ const ManageUsers = () => {
       isOpen: true, 
       user: u, 
       username: u.username, 
-      email: u.email 
+      email: u.email,
+      profileVisibility: u.profileVisibility || 'public',
+      accountStatus: u.accountStatus || 'active'
     });
   };
 
@@ -93,10 +95,12 @@ const ManageUsers = () => {
       // This edit flow is intentionally limited to profile basics, not role or password changes.
       await Api.put(`/users/${editModal.user._id}`, { 
         username: editModal.username, 
-        email: editModal.email 
+        email: editModal.email,
+        profileVisibility: editModal.profileVisibility,
+        accountStatus: editModal.accountStatus
       });
       fetchUsers();
-      setEditModal({ isOpen: false, user: null, username: '', email: '' });
+      setEditModal({ isOpen: false, user: null, username: '', email: '', profileVisibility: 'public', accountStatus: 'active' });
     } catch (error) {
       console.error("Failed to update user", error);
       alert(error.response?.data?.message || "Failed to update user.");
@@ -269,7 +273,7 @@ const ManageUsers = () => {
       )}
 
       {editModal.isOpen && (
-        <div className="modal-overlay" style={{ zIndex: 2000 }} onClick={() => setEditModal({ isOpen: false, user: null, username: '', email: '' })}>
+        <div className="modal-overlay" style={{ zIndex: 2000 }} onClick={() => setEditModal({ isOpen: false, user: null, username: '', email: '', profileVisibility: 'public', accountStatus: 'active' })}>
           <div className="popup-modal-content" onClick={e => e.stopPropagation()} style={{ textAlign: 'left' }}>
             <h2 className="admin-modal-title edit-title">Edit User Details</h2>
             <form onSubmit={handleSaveEdit}>
@@ -293,10 +297,32 @@ const ManageUsers = () => {
                   className="admin-edit-input"
                 />
               </div>
+              <div style={{ marginBottom: '16px' }}>
+                <label className="admin-edit-label">Account Type</label>
+                <select
+                  value={editModal.profileVisibility}
+                  onChange={(e) => setEditModal({...editModal, profileVisibility: e.target.value})}
+                  className="admin-edit-input"
+                >
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+                </select>
+              </div>
+              <div style={{ marginBottom: '32px' }}>
+                <label className="admin-edit-label">Status</label>
+                <select
+                  value={editModal.accountStatus}
+                  onChange={(e) => setEditModal({...editModal, accountStatus: e.target.value})}
+                  className="admin-edit-input"
+                >
+                  <option value="active">Active</option>
+                  <option value="blocked">Blocked</option>
+                </select>
+              </div>
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                 <button 
                   type="button"
-                  onClick={() => setEditModal({ isOpen: false, user: null, username: '', email: '' })}
+                  onClick={() => setEditModal({ isOpen: false, user: null, username: '', email: '', profileVisibility: 'public', accountStatus: 'active' })}
                   className="admin-modal-cancel-btn"
                 >
                   Cancel

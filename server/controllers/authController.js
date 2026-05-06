@@ -56,6 +56,11 @@ export const login = async (req, res, next) => {
 
         const user = await User.findOne({ email });
 
+        if (user?.accountStatus === "blocked") {
+            res.status(403);
+            throw new Error("Your account has been blocked");
+        }
+
         if (user && (await comparePassword(password, user.password))) {
             res.status(200).json({
                 success: true,
@@ -64,6 +69,8 @@ export const login = async (req, res, next) => {
                     username: user.username,
                     email: user.email,
                     role: user.role,
+                    profileVisibility: user.profileVisibility,
+                    accountStatus: user.accountStatus,
                     token: generateToken(user._id, user.role)
                 }
             });

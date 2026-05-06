@@ -12,6 +12,7 @@ import commentRoutes from "./routes/commentRoutes.js";
 import ratingRoutes from "./routes/ratingRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import statusRoutes from "./routes/statusRoutes.js";
+import socialRoutes from "./routes/socialRoutes.js";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/status", statusRoutes);
+app.use("/api/social", socialRoutes);
 
 
 const __filename = fileURLToPath(import.meta.url);

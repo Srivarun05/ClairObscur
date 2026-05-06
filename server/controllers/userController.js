@@ -66,6 +66,10 @@ export const updateUserProfile = async (req, res, next) => {
             user.username = req.body.username;
         }
 
+        if (req.body.profileVisibility && ["public", "private"].includes(req.body.profileVisibility)) {
+            user.profileVisibility = req.body.profileVisibility;
+        }
+
         if (req.file) {
             if (user.profilePic) {
                 fs.unlink(user.profilePic, (err) => {
@@ -84,7 +88,9 @@ export const updateUserProfile = async (req, res, next) => {
                 username: updatedUser.username,
                 email: updatedUser.email,
                 profilePic: updatedUser.profilePic,
-                role: updatedUser.role
+                role: updatedUser.role,
+                profileVisibility: updatedUser.profileVisibility,
+                accountStatus: updatedUser.accountStatus
             }
         });
     } catch (error) {
@@ -108,6 +114,12 @@ export const updateUserByAdmin = async (req, res, next) => {
 
         user.username = req.body.username || user.username;
         user.email = req.body.email || user.email;
+        if (req.body.accountStatus && ["active", "blocked"].includes(req.body.accountStatus)) {
+            user.accountStatus = req.body.accountStatus;
+        }
+        if (req.body.profileVisibility && ["public", "private"].includes(req.body.profileVisibility)) {
+            user.profileVisibility = req.body.profileVisibility;
+        }
 
         const updatedUser = await user.save();
 
