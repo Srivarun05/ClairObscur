@@ -3,9 +3,10 @@ import Follow from "../models/Follow.js";
 import Notification from "../models/Notification.js";
 import Block from "../models/Block.js";
 import Report from "../models/Report.js";
-import { emitNotification, emitToAdmins, getOnlineUserIds } from "../utils/socket.js";
+import { emitNotification, emitToAdmins, emitToUser, getOnlineUserIds } from "../utils/socket.js";
 
 const publicUserFields = "username email profilePic role profileVisibility accountStatus isOnline lastSeen createdAt";
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 const getFollowStats = async (userId) => {
     const [followersCount, followingCount] = await Promise.all([
@@ -20,6 +21,31 @@ const getRelationship = async (viewerId, targetId) => {
     if (!viewerId || viewerId.toString() === targetId.toString()) return "self";
     const follow = await Follow.findOne({ follower: viewerId, following: targetId });
     return follow?.status || "none";
+};
+
+const createDailyNotification = async ({ recipient, actor, type, message, metadata = {} }) => {
+    const since = new Date(Date.now() - ONE_DAY_MS);
+    return Notification.findOneAndUpdate(
+        {
+            recipient,
+            actor,
+            type,
+            createdAt: { $gte: since }
+        },
+        {
+            recipient,
+            actor,
+            type,
+            message,
+            metadata,
+            isRead: false
+        },
+        {
+            upsert: true,
+            returnDocument: "after",
+            setDefaultsOnInsert: true
+        }
+    );
 };
 
 export const discoverUsers = async (req, res, next) => {
@@ -114,7 +140,7 @@ export const followUser = async (req, res, next) => {
             { upsert: true, returnDocument: "after" }
         );
 
-        const notification = await Notification.create({
+        const notification = await createDailyNotification({
             recipient: target._id,
             actor: req.user._id,
             type: status === "pending" ? "follow_request" : "follow",
@@ -123,6 +149,7 @@ export const followUser = async (req, res, next) => {
                 : `${req.user.username} followed you.`
         });
         await emitNotification(notification);
+        emitToUser(target._id, "social:refresh", { reason: status === "pending" ? "follow_request" : "follow", profileId: req.user._id });
         emitToAdmins("social:refresh", { reason: status === "pending" ? "follow_request" : "follow" });
 
         res.status(200).json({ success: true, data: follow });
@@ -134,6 +161,7 @@ export const followUser = async (req, res, next) => {
 export const unfollowUser = async (req, res, next) => {
     try {
         await Follow.findOneAndDelete({ follower: req.user._id, following: req.params.userId });
+        emitToUser(req.params.userId, "social:refresh", { reason: "unfollow", profileId: req.user._id });
         emitToAdmins("social:refresh", { reason: "unfollow" });
         res.status(200).json({ success: true, message: "Unfollowed" });
     } catch (error) {
@@ -172,7 +200,7 @@ export const respondToFollowRequest = async (req, res, next) => {
         }
 
         if (status === "accepted") {
-            const notification = await Notification.create({
+            const notification = await createDailyNotification({
                 recipient: request.follower._id,
                 actor: req.user._id,
                 type: "follow_accepted",
@@ -180,6 +208,8 @@ export const respondToFollowRequest = async (req, res, next) => {
             });
             await emitNotification(notification);
         }
+        emitToUser(request.follower._id, "social:refresh", { reason: `follow_request_${status}`, profileId: req.user._id });
+        emitToUser(req.user._id, "social:refresh", { reason: `follow_request_${status}`, profileId: request.follower._id });
         emitToAdmins("social:refresh", { reason: "follow_request_reviewed" });
 
         res.status(200).json({ success: true, data: request });
@@ -190,9 +220,10 @@ export const respondToFollowRequest = async (req, res, next) => {
 
 export const getNotifications = async (req, res, next) => {
     try {
-        const notifications = await Notification.find({ recipient: req.user._id })
+        const since = new Date(Date.now() - ONE_DAY_MS);
+        const notifications = await Notification.find({ recipient: req.user._id, createdAt: { $gte: since } })
             .populate("actor", publicUserFields)
-            .sort({ createdAt: -1 })
+            .sort({ updatedAt: -1 })
             .limit(50);
         res.status(200).json({ success: true, data: notifications });
     } catch (error) {
@@ -225,13 +256,13 @@ export const reportUser = async (req, res, next) => {
 
         const admins = await User.find({ role: "admin" }).select("_id");
         if (admins.length > 0) {
-            const notifications = await Notification.insertMany(admins.map(admin => ({
-                recipient: admin._id,
-                actor: req.user._id,
-                type: "report",
-                message: `${req.user.username} reported an account for review.`,
-                metadata: { reportId: report._id, reportedUserId: req.params.userId }
-            })));
+            const notifications = await Promise.all(admins.map(admin => createDailyNotification({
+                    recipient: admin._id,
+                    actor: req.user._id,
+                    type: "report",
+                    message: `${req.user.username} reported an account for review.`,
+                    metadata: { reportId: report._id, reportedUserId: req.params.userId }
+                })));
             await Promise.all(notifications.map(notification => emitNotification(notification)));
             emitToAdmins("social:refresh", { reason: "report_created" });
         }
@@ -329,7 +360,7 @@ export const reviewReport = async (req, res, next) => {
             throw new Error("Report not found");
         }
 
-        const notification = await Notification.create({
+        const notification = await createDailyNotification({
             recipient: report.reporter._id,
             actor: req.user._id,
             type: "report",

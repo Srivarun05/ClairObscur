@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; 
+import React, { useCallback, useState, useEffect, useRef } from 'react'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { PieChart, User as UserIcon, LogOut, Menu, X, Heart, Library, Shield, Plus, Users, Sun, Moon, Bell } from 'lucide-react';
@@ -25,6 +25,17 @@ const TopNav = ({ onOpenCreateModal }) => {
 
   const [theme, setTheme] = useState(() => localStorage.getItem('crateon-theme') || 'dark');
 
+  const loadNotifications = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const response = await Api.get('/social/notifications');
+      setNotifications(response.data.data || []);
+    } catch {
+      setNotifications([]);
+    }
+  }, [user]);
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     document.body.setAttribute('data-theme', theme);
@@ -36,19 +47,8 @@ const TopNav = ({ onOpenCreateModal }) => {
   };
 
   useEffect(() => {
-    if (!user) return;
-
-    const loadNotifications = async () => {
-      try {
-        const response = await Api.get('/social/notifications');
-        setNotifications(response.data.data || []);
-      } catch {
-        setNotifications([]);
-      }
-    };
-
     loadNotifications();
-  }, [user]);
+  }, [loadNotifications]);
 
   useEffect(() => {
     if (!user) return;
@@ -58,19 +58,36 @@ const TopNav = ({ onOpenCreateModal }) => {
 
     const handleNewNotification = (notification) => {
       setNotifications(prev => {
-        if (prev.some(item => item._id === notification._id)) return prev;
-        return [notification, ...prev].slice(0, 50);
+        const withoutExisting = prev.filter(item => item._id !== notification._id);
+        const nextNotification = { ...notification, isRead: false };
+        return [nextNotification, ...withoutExisting].slice(0, 50);
       });
     };
 
     socket.on('notification:new', handleNewNotification);
+    socket.on('connect', loadNotifications);
 
     return () => {
       socket.off('notification:new', handleNewNotification);
+      socket.off('connect', loadNotifications);
     };
-  }, [user]);
+  }, [loadNotifications, user]);
 
   const unreadCount = notifications.filter(notification => !notification.isRead).length;
+
+  const getNotificationPath = (notification) => {
+    if (notification.type === 'follow_request') return '/people';
+    if (notification.type === 'report' && user?.role === 'admin') return '/admin/social';
+    if (notification.actor?._id) return `/profile/${notification.actor._id}`;
+    if (notification.metadata?.reportedUserId) return `/profile/${notification.metadata.reportedUserId}`;
+    return '/people';
+  };
+
+  const openNotification = (notification) => {
+    navigate(getNotificationPath(notification));
+    setIsNotificationsOpen(false);
+    setIsMobileMenuOpen(false);
+  };
 
   const toggleNotifications = async () => {
     setIsNotificationsOpen(prev => !prev);
@@ -78,10 +95,6 @@ const TopNav = ({ onOpenCreateModal }) => {
       try {
         await Api.put('/social/notifications/read');
         setNotifications(prev => prev.map(notification => ({ ...notification, isRead: true })));
-        window.setTimeout(() => {
-          setNotifications(prev => prev.filter(notification => !notification.isRead));
-          setIsNotificationsOpen(false);
-        }, 5000);
       } catch (error) {
         console.error('Failed to mark notifications read', error);
       }
@@ -168,9 +181,21 @@ const TopNav = ({ onOpenCreateModal }) => {
                   <p>No notifications yet.</p>
                 ) : (
                   notifications.slice(0, 8).map(notification => (
-                    <div className="notification-item" key={notification._id}>
-                      {notification.message}
-                    </div>
+                    <button
+                      type="button"
+                      className="notification-item"
+                      key={notification._id}
+                      onClick={() => openNotification(notification)}
+                    >
+                      <span className="notification-avatar">
+                        {notification.actor?.profilePic ? (
+                          <img src={getImageUrl(notification.actor.profilePic)} alt={notification.actor.username || 'User'} />
+                        ) : (
+                          notification.actor?.username?.[0]?.toUpperCase() || '!'
+                        )}
+                      </span>
+                      <span>{notification.message}</span>
+                    </button>
                   ))
                 )}
               </div>
@@ -251,7 +276,21 @@ const TopNav = ({ onOpenCreateModal }) => {
                 <p>No notifications yet.</p>
               ) : (
                 notifications.slice(0, 5).map(notification => (
-                  <p key={notification._id}>{notification.message}</p>
+                  <button
+                    type="button"
+                    className="notification-item"
+                    key={notification._id}
+                    onClick={() => openNotification(notification)}
+                  >
+                    <span className="notification-avatar">
+                      {notification.actor?.profilePic ? (
+                        <img src={getImageUrl(notification.actor.profilePic)} alt={notification.actor.username || 'User'} />
+                      ) : (
+                        notification.actor?.username?.[0]?.toUpperCase() || '!'
+                      )}
+                    </span>
+                    <span>{notification.message}</span>
+                  </button>
                 ))
               )}
             </div>

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Lock, Settings, ShieldAlert, UserMinus, UserPlus } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import Api from '../../Api';
 import TopNav from '../../components/layout/TopNav';
 import { getImageUrl } from '../../config';
+import { getSocket } from '../../socket';
 import '../../styles/social.css';
 
 const PublicProfile = () => {
@@ -14,14 +15,31 @@ const PublicProfile = () => {
   const [reportReason, setReportReason] = useState('');
   const [reportMessage, setReportMessage] = useState('');
 
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     const response = await Api.get(`/social/profiles/${userId}`);
     setProfile(response.data.data);
-  };
+  }, [userId]);
 
   useEffect(() => {
     loadProfile();
-  }, [userId]);
+  }, [loadProfile]);
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const refreshProfile = (payload) => {
+      if (!payload?.profileId || String(payload.profileId) === String(userId)) {
+        loadProfile();
+      }
+    };
+
+    socket.on('social:refresh', refreshProfile);
+
+    return () => {
+      socket.off('social:refresh', refreshProfile);
+    };
+  }, [loadProfile, userId]);
 
   const follow = async () => {
     await Api.post(`/social/profiles/${userId}/follow`);
@@ -69,6 +87,8 @@ const PublicProfile = () => {
               <button onClick={unfollow}><UserMinus size={16} /> Unfollow</button>
             ) : relationship === 'pending' ? (
               <button disabled><Lock size={16} /> Requested</button>
+            ) : relationship === 'declined' ? (
+              <button onClick={follow}><UserPlus size={16} /> Follow</button>
             ) : relationship !== 'self' && (
               <button onClick={follow}><UserPlus size={16} /> Follow</button>
             )}

@@ -225,6 +225,33 @@
   border-color: var(--accent-color);
 }
 
+.social-request-user {
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--text-main) !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 0 !important;
+  text-align: left;
+}
+
+.social-request-user:hover span {
+  color: var(--accent-color);
+}
+
+.social-request-avatar {
+  flex: 0 0 auto;
+  height: 42px;
+  width: 42px;
+}
+
+.social-request-user span {
+  font-weight: 800;
+}
+
 .social-list-row button,
 .profile-actions button {
   background: var(--accent-color);
@@ -237,6 +264,11 @@
   gap: 8px;
   font-weight: 800;
   padding: 10px 14px;
+}
+
+.profile-actions button:disabled {
+  cursor: default;
+  opacity: 0.82;
 }
 
 .social-list-row button.danger,

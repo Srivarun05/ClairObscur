@@ -32,7 +32,7 @@ export const emitToAdmins = (event, payload) => {
 export const emitNotification = async (notification) => {
     if (!notification) return;
     const populated = await notification.populate("actor", "username email profilePic role profileVisibility accountStatus createdAt");
-    emitToUser(populated.recipient, "notification:new", populated);
+    emitToUser(populated.recipient, "notification:new", populated.toObject());
 };
 
 export const emitPresenceSummary = () => {

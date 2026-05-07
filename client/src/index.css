@@ -1351,10 +1351,38 @@ body[data-theme] .mobile-notification-list p {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 13px;
   line-height: 1.4;
   padding: 10px;
   margin-bottom: 8px;
+  text-align: left;
+  width: 100%;
+}
+
+body[data-theme] .notification-item:hover {
+  background: var(--bg-hover);
+}
+
+body[data-theme] .notification-avatar {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  display: grid;
+  flex: 0 0 auto;
+  height: 30px;
+  overflow: hidden;
+  place-items: center;
+  width: 30px;
+}
+
+body[data-theme] .notification-avatar img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 body[data-theme] .mobile-notification-list {

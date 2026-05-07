@@ -38,9 +38,11 @@ const People = () => {
     };
 
     socket.on('notification:new', refreshRequests);
+    socket.on('social:refresh', loadSocial);
 
     return () => {
       socket.off('notification:new', refreshRequests);
+      socket.off('social:refresh', loadSocial);
     };
   }, [loadSocial]);
 
@@ -99,7 +101,20 @@ const People = () => {
           </div>
           {requests.length === 0 ? <p className="social-muted">No pending requests.</p> : requests.map(request => (
             <div className="social-list-row" key={request._id}>
-              <span>{request.follower?.username}</span>
+              <button
+                type="button"
+                className="social-request-user"
+                onClick={() => navigate(`/profile/${request.follower?._id}`)}
+              >
+                <div className="social-avatar social-request-avatar">
+                  {request.follower?.profilePic ? (
+                    <img src={getImageUrl(request.follower.profilePic)} alt={request.follower.username} />
+                  ) : (
+                    request.follower?.username?.[0]?.toUpperCase() || 'U'
+                  )}
+                </div>
+                <span>{request.follower?.username}</span>
+              </button>
               <div>
                 <button onClick={() => respond(request._id, 'accepted')}><Check size={15} /></button>
                 <button className="danger" onClick={() => respond(request._id, 'declined')}><X size={15} /></button>
