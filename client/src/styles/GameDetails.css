@@ -476,9 +476,10 @@
 }
 
 .status-completed:hover, .status-completed.active { 
-  background: #84cc16; 
-  color: #000; 
+  background: rgba(132, 204, 22, 0.16); 
+  color: #bef264; 
   border-color: #84cc16; 
+  box-shadow: 0 0 14px rgba(132, 204, 22, 0.22);
 }
 
 .status-planning {
@@ -509,9 +510,10 @@
 }
 
 .status-paused:hover, .status-paused.active { 
-  background: #f59e0b; 
-  color: #000; 
+  background: rgba(245, 158, 11, 0.16); 
+  color: #fbbf24; 
   border-color: #f59e0b; 
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.22);
 }
 
 .status-dropped { 
@@ -520,9 +522,10 @@
 }
 
 .status-dropped:hover, .status-dropped.active {
-  background: #fb7185; 
-  color: #000; 
+  background: rgba(251, 113, 133, 0.16); 
+  color: #fb7185; 
   border-color: #fb7185; 
+  box-shadow: 0 0 14px rgba(251, 113, 133, 0.22);
 }
 
 .view-library-link {
