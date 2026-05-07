@@ -37,6 +37,14 @@ const userSchema = mongoose.Schema({
         type: String,
         enum: ["active", "blocked"],
         default: "active"
+    },
+    isOnline: {
+        type: Boolean,
+        default: false
+    },
+    lastSeen: {
+        type: Date,
+        default: null
     }
 }, { timestamps: true });
 

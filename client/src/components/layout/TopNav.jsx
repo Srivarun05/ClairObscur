@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { PieChart, User as UserIcon, LogOut, Menu, X, Heart, Library, Shield, Plus, Users, Sun, Moon, Bell } from 'lucide-react';
 import UserProfileModal from '../dashboard/UserProfileModal'; 
 import Api from '../../Api';
+import { disconnectSocket, getSocket } from '../../socket';
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
@@ -41,12 +42,32 @@ const TopNav = ({ onOpenCreateModal }) => {
       try {
         const response = await Api.get('/social/notifications');
         setNotifications(response.data.data || []);
-      } catch (error) {
+      } catch {
         setNotifications([]);
       }
     };
 
     loadNotifications();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleNewNotification = (notification) => {
+      setNotifications(prev => {
+        if (prev.some(item => item._id === notification._id)) return prev;
+        return [notification, ...prev].slice(0, 50);
+      });
+    };
+
+    socket.on('notification:new', handleNewNotification);
+
+    return () => {
+      socket.off('notification:new', handleNewNotification);
+    };
   }, [user]);
 
   const unreadCount = notifications.filter(notification => !notification.isRead).length;
@@ -86,6 +107,7 @@ const TopNav = ({ onOpenCreateModal }) => {
   }, [isNotificationsOpen]);
 
   const handleLogout = () => {
+    disconnectSocket();
     logout();
     navigate('/login');
   };

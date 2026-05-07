@@ -5,6 +5,7 @@ import Api from '../../Api';
 import TopNav from '../../components/layout/TopNav';
 import { getImageUrl } from '../../config';
 import '../../styles/admin.css';
+import '../../styles/librarymodal.css';
 
 const STATUS_CATEGORIES = [
   { id: 'Playing', icon: <Play size={18} />, color: '#a855f7' },
@@ -284,7 +285,7 @@ const AdminUserLibrary = () => {
 
       {editingRecord && (
         <div className="modal-overlay" style={{ zIndex: 3000 }} onClick={() => setEditingRecord(null)}>
-          <div className="admin-tracker-modal" onClick={event => event.stopPropagation()}>
+          <div className="tracker-modal-content" onClick={event => event.stopPropagation()}>
             <div className="tracker-hero" style={{ backgroundImage: `url(${getImageUrl(editingRecord.game.image)})` }}>
               <div className="tracker-hero-overlay"></div>
               <button className="tracker-close-btn" onClick={() => setEditingRecord(null)}><X size={20} /></button>

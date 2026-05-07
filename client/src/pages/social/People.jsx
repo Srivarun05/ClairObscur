@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Check, Lock, Search, UserPlus, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Api from '../../Api';
 import TopNav from '../../components/layout/TopNav';
 import { getImageUrl } from '../../config';
+import { getSocket } from '../../socket';
 import '../../styles/social.css';
 
 const People = () => {
@@ -13,18 +14,35 @@ const People = () => {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
-  const loadSocial = async () => {
+  const loadSocial = useCallback(async () => {
     const [usersRes, requestsRes] = await Promise.all([
       Api.get(`/social/users?q=${encodeURIComponent(debouncedQuery)}`),
       Api.get('/social/requests')
     ]);
     setUsers(usersRes.data.data || []);
     setRequests(requestsRes.data.data || []);
-  };
+  }, [debouncedQuery]);
 
   useEffect(() => {
     loadSocial();
-  }, [debouncedQuery]);
+  }, [loadSocial]);
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const refreshRequests = (notification) => {
+      if (notification.type === 'follow_request' || notification.type === 'follow_accepted') {
+        loadSocial();
+      }
+    };
+
+    socket.on('notification:new', refreshRequests);
+
+    return () => {
+      socket.off('notification:new', refreshRequests);
+    };
+  }, [loadSocial]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {

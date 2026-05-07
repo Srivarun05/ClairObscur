@@ -3,8 +3,9 @@ import Follow from "../models/Follow.js";
 import Notification from "../models/Notification.js";
 import Block from "../models/Block.js";
 import Report from "../models/Report.js";
+import { emitNotification, emitToAdmins, getOnlineUserIds } from "../utils/socket.js";
 
-const publicUserFields = "username email profilePic role profileVisibility accountStatus createdAt";
+const publicUserFields = "username email profilePic role profileVisibility accountStatus isOnline lastSeen createdAt";
 
 const getFollowStats = async (userId) => {
     const [followersCount, followingCount] = await Promise.all([
@@ -113,7 +114,7 @@ export const followUser = async (req, res, next) => {
             { upsert: true, returnDocument: "after" }
         );
 
-        await Notification.create({
+        const notification = await Notification.create({
             recipient: target._id,
             actor: req.user._id,
             type: status === "pending" ? "follow_request" : "follow",
@@ -121,6 +122,8 @@ export const followUser = async (req, res, next) => {
                 ? `${req.user.username} requested to follow you.`
                 : `${req.user.username} followed you.`
         });
+        await emitNotification(notification);
+        emitToAdmins("social:refresh", { reason: status === "pending" ? "follow_request" : "follow" });
 
         res.status(200).json({ success: true, data: follow });
     } catch (error) {
@@ -131,6 +134,7 @@ export const followUser = async (req, res, next) => {
 export const unfollowUser = async (req, res, next) => {
     try {
         await Follow.findOneAndDelete({ follower: req.user._id, following: req.params.userId });
+        emitToAdmins("social:refresh", { reason: "unfollow" });
         res.status(200).json({ success: true, message: "Unfollowed" });
     } catch (error) {
         next(error);
@@ -168,13 +172,15 @@ export const respondToFollowRequest = async (req, res, next) => {
         }
 
         if (status === "accepted") {
-            await Notification.create({
+            const notification = await Notification.create({
                 recipient: request.follower._id,
                 actor: req.user._id,
                 type: "follow_accepted",
                 message: `${req.user.username} accepted your follow request.`
             });
+            await emitNotification(notification);
         }
+        emitToAdmins("social:refresh", { reason: "follow_request_reviewed" });
 
         res.status(200).json({ success: true, data: request });
     } catch (error) {
@@ -219,13 +225,15 @@ export const reportUser = async (req, res, next) => {
 
         const admins = await User.find({ role: "admin" }).select("_id");
         if (admins.length > 0) {
-            await Notification.insertMany(admins.map(admin => ({
+            const notifications = await Notification.insertMany(admins.map(admin => ({
                 recipient: admin._id,
                 actor: req.user._id,
                 type: "report",
                 message: `${req.user.username} reported an account for review.`,
                 metadata: { reportId: report._id, reportedUserId: req.params.userId }
             })));
+            await Promise.all(notifications.map(notification => emitNotification(notification)));
+            emitToAdmins("social:refresh", { reason: "report_created" });
         }
 
         res.status(201).json({ success: true, data: report });
@@ -247,6 +255,7 @@ export const blockUser = async (req, res, next) => {
                 { follower: req.params.userId, following: req.user._id }
             ]
         });
+        emitToAdmins("social:refresh", { reason: "block" });
         res.status(200).json({ success: true, data: block });
     } catch (error) {
         next(error);
@@ -256,6 +265,7 @@ export const blockUser = async (req, res, next) => {
 export const getAdminSocialOverview = async (req, res, next) => {
     try {
         const users = await User.find({}).select(publicUserFields).sort({ createdAt: -1 });
+        const onlineUserIds = new Set(getOnlineUserIds());
         const rows = await Promise.all(users.map(async (user) => {
             const [stats, pendingRequestsCount, blockedUsersCount, reportsCount] = await Promise.all([
                 getFollowStats(user._id),
@@ -266,6 +276,7 @@ export const getAdminSocialOverview = async (req, res, next) => {
 
             return {
                 ...user.toObject(),
+                isOnline: onlineUserIds.has(user._id.toString()),
                 ...stats,
                 pendingRequestsCount,
                 blockedUsersCount,
@@ -318,7 +329,7 @@ export const reviewReport = async (req, res, next) => {
             throw new Error("Report not found");
         }
 
-        await Notification.create({
+        const notification = await Notification.create({
             recipient: report.reporter._id,
             actor: req.user._id,
             type: "report",
@@ -326,6 +337,8 @@ export const reviewReport = async (req, res, next) => {
                 ? `Your report about ${report.reported.username} was accepted by moderation.`
                 : `Your report about ${report.reported.username} was declined by moderation.`
         });
+        await emitNotification(notification);
+        emitToAdmins("social:refresh", { reason: "report_reviewed" });
 
         res.status(200).json({ success: true, data: report });
     } catch (error) {

@@ -1,4 +1,5 @@
 import express from "express";
+import { createServer } from "http";
 import dotenv from "dotenv";
 import connectdb from "./config/db.js";
 import cors from "cors";
@@ -13,14 +14,19 @@ import ratingRoutes from "./routes/ratingRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import statusRoutes from "./routes/statusRoutes.js";
 import socialRoutes from "./routes/socialRoutes.js";
+import { initializeSocket } from "./utils/socket.js";
 
 dotenv.config();
 
 connectdb();
 
 const app = express();
+const server = createServer(app);
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+    credentials: true
+}));
 app.use(express.json());
 
 app.use("/api/", gameRoutes); 
@@ -41,6 +47,8 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+initializeSocket(server);
+
+server.listen(PORT, () => {
     console.log(`Successfully connected to PORT: ${PORT}`);
 });
