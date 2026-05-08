@@ -56,12 +56,17 @@ export const login = async (req, res, next) => {
 
         const user = await User.findOne({ email });
 
-        if (user?.accountStatus === "blocked") {
+        if (!user) {
+            res.status(401);
+            throw new Error("Enter correct email");
+        }
+
+        if (user.accountStatus === "blocked") {
             res.status(403);
             throw new Error("Your account has been blocked");
         }
 
-        if (user && (await comparePassword(password, user.password))) {
+        if (await comparePassword(password, user.password)) {
             res.status(200).json({
                 success: true,
                 data: {
@@ -76,7 +81,7 @@ export const login = async (req, res, next) => {
             });
         } else {
             res.status(401);
-            throw new Error("Invalid credentials");
+            throw new Error("Password entered wrong kindly enter correct password");
         }
     } catch (error) {
         next(error);

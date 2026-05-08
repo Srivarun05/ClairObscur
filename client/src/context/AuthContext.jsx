@@ -21,7 +21,10 @@ export const AuthProvider = ({ children }) => {
     const interceptor = Api.interceptors.response.use(
       (response) => response, 
       (error) => {
-        if (error.response && error.response.status === 401) {
+        const requestUrl = error.config?.url || '';
+        const isAuthRequest = requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register');
+
+        if (error.response && error.response.status === 401 && !isAuthRequest) {
           logout();
           window.location.href = '/login?session=expired'; 
         }

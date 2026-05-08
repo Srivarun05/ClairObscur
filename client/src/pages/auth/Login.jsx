@@ -35,7 +35,15 @@ const Login = () => {
       navigate('/home'); 
 
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to login. Please try again.');
+      const message = err.response?.data?.message || 'Failed to login. Please try again.';
+
+      if (message.toLowerCase().includes('email')) {
+        setError('Enter correct email');
+      } else if (message.toLowerCase().includes('password')) {
+        setError('Password entered wrong kindly enter correct password');
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -67,12 +75,11 @@ const Login = () => {
             <h2 className="auth-title">Welcome back</h2>
             <p className="auth-subtitle">Please enter your details to sign in.</p>
 
-            {/* API validation or credential errors are surfaced inline instead of using alerts. */}
-            {error && <div className="error-msg">{error}</div>}
-
             <form onSubmit={handleLogin}>
               <div className="form-group">
                 <label className="form-label">Email Address</label>
+                {/* Credential errors sit above the first field so users see them before retrying. */}
+                {error && <div className="field-error-msg">{error}</div>}
                 <div className="input-wrapper">
                   <Mail className="input-icon" />
                   <input 
@@ -80,7 +87,11 @@ const Login = () => {
                     className="form-input" 
                     placeholder="name@example.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setError('');
+                    }}
+                    aria-invalid={Boolean(error)}
                     required
                   />
                 </div>
@@ -95,7 +106,10 @@ const Login = () => {
                     className="form-input" 
                     placeholder="••••••••"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError('');
+                    }}
                     required
                   />
                 </div>
