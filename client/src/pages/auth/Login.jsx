@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Api from '../../Api'; 
 import { useAuth } from '../../context/AuthContext';
-import { Mail, Lock, ArrowRight, PieChart } from 'lucide-react';
+import { Mail, Lock, ArrowRight, PieChart, Eye, EyeOff } from 'lucide-react';
 import libraryImage from '../../assets/Library.png'; 
 import bgImage from '../../assets/LibraryBlur.png'; 
 import ThemeToggle from '../../components/common/ThemeToggle';
@@ -14,6 +14,7 @@ const Login = () => {
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -102,8 +103,8 @@ const Login = () => {
                 <div className="input-wrapper">
                   <Lock className="input-icon" />
                   <input 
-                    type="password" 
-                    className="form-input" 
+                    type={showPassword ? 'text' : 'password'} 
+                    className="form-input password-input" 
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => {
@@ -112,6 +113,15 @@ const Login = () => {
                     }}
                     required
                   />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword((current) => !current)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+                  </button>
                 </div>
               </div>
 
