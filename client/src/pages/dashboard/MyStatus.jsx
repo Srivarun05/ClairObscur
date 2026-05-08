@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Api from '../../Api';
+import BackButton from '../../components/common/BackButton';
 import TopNav from '../../components/layout/TopNav';
 import { Play, Calendar, CheckCircle, Pause, XCircle, BarChart3, Target } from 'lucide-react';
 import { getImageUrl } from '../../config';
@@ -93,6 +94,7 @@ const MyStatus = () => {
     <div className="steam-dashboard">
       <TopNav />
       <main className="dashboard-main">
+        <BackButton fallbackTo="/home" />
         <h1 style={{ fontSize: '36px', fontWeight: '800', marginBottom: '8px' }}>My Library</h1>
         <p className="library-subtitle">Track and manage your gaming journey.</p>
 

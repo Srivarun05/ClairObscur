@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Lock, Settings, ShieldAlert, UserMinus, UserPlus } from 'lucide-react';
+import { Gamepad2, Lock, Settings, ShieldAlert, UserMinus, UserPlus } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import Api from '../../Api';
+import BackButton from '../../components/common/BackButton';
 import TopNav from '../../components/layout/TopNav';
 import { getImageUrl } from '../../config';
 import { getSocket } from '../../socket';
@@ -87,13 +88,14 @@ const PublicProfile = () => {
 
   if (!profile) return null;
 
-  const { user, relationship, followersCount, followingCount, followers, following, canViewDetails } = profile;
+  const { user, relationship, followersCount, followingCount, followers, following, canViewDetails, library = [], libraryMessage } = profile;
   const profileAccentStyle = profileAccent ? { '--profile-accent': profileAccent } : undefined;
 
   return (
     <div className="steam-dashboard">
       <TopNav />
       <main className="dashboard-main">
+        <BackButton fallbackTo="/people" />
         <section className="public-profile-card profile-accent-surface" style={profileAccentStyle}>
           <div className="public-profile-avatar">
             {user.profilePic ? <img src={getImageUrl(user.profilePic)} alt={user.username} /> : user.username?.[0]?.toUpperCase()}
@@ -137,19 +139,40 @@ const PublicProfile = () => {
 
         {!canViewDetails ? (
           <div className="social-panel private-profile-note profile-accent-surface" style={profileAccentStyle}>
-            <Lock size={20} /> This profile is private. Follow request approval is required.
+            <Lock size={20} /> {libraryMessage || "Only followers can view this user's library."}
           </div>
         ) : (
-          <section className="social-two-col">
-            <div className="social-panel profile-accent-surface" style={profileAccentStyle}>
-              <div className="social-panel-title">Followers</div>
-              {followers.map(item => <p key={item._id} className="social-muted">{item.username}</p>)}
-            </div>
-            <div className="social-panel profile-accent-surface" style={profileAccentStyle}>
-              <div className="social-panel-title">Following</div>
-              {following.map(item => <p key={item._id} className="social-muted">{item.username}</p>)}
-            </div>
-          </section>
+          <>
+            <section className="social-panel profile-accent-surface" style={profileAccentStyle}>
+              <div className="social-panel-title"><Gamepad2 size={18} /> Library</div>
+              {library.length === 0 ? (
+                <p className="social-muted">No games tracked yet.</p>
+              ) : (
+                <div className="profile-library-grid">
+                  {library.map(item => (
+                    <article className="profile-library-card" key={item._id}>
+                      <img src={getImageUrl(item.game.image)} alt={item.game.name} />
+                      <div>
+                        <h3>{item.game.name}</h3>
+                        <span>{item.status}</span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section className="social-two-col">
+              <div className="social-panel profile-accent-surface" style={profileAccentStyle}>
+                <div className="social-panel-title">Followers</div>
+                {followers.map(item => <p key={item._id} className="social-muted">{item.username}</p>)}
+              </div>
+              <div className="social-panel profile-accent-surface" style={profileAccentStyle}>
+                <div className="social-panel-title">Following</div>
+                {following.map(item => <p key={item._id} className="social-muted">{item.username}</p>)}
+              </div>
+            </section>
+          </>
         )}
       </main>
 

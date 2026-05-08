@@ -3,6 +3,7 @@ import Follow from "../models/Follow.js";
 import Notification from "../models/Notification.js";
 import Block from "../models/Block.js";
 import Report from "../models/Report.js";
+import GameStatus from "../models/GameStatus.js";
 import { emitNotification, emitToAdmins, emitToUser, getOnlineUserIds } from "../utils/socket.js";
 
 const publicUserFields = "username email profilePic role profileVisibility accountStatus isOnline lastSeen createdAt";
@@ -90,12 +91,18 @@ export const getPublicProfile = async (req, res, next) => {
         const relationship = await getRelationship(req.user?._id, user._id);
         const isAdmin = req.user?.role === "admin";
         const canViewDetails = isAdmin || user.profileVisibility === "public" || relationship === "accepted" || relationship === "self";
-        const [followers, following, pendingRequests, blockedByUser, reports] = await Promise.all([
+        const [followers, following, pendingRequests, blockedByUser, reports, library] = await Promise.all([
             Follow.find({ following: user._id, status: "accepted" }).populate("follower", publicUserFields),
             Follow.find({ follower: user._id, status: "accepted" }).populate("following", publicUserFields),
             isAdmin || relationship === "self" ? Follow.find({ following: user._id, status: "pending" }).populate("follower", publicUserFields) : [],
             isAdmin ? Block.find({ blocker: user._id }).populate("blocked", publicUserFields) : [],
-            isAdmin ? Report.find({ reported: user._id }).populate("reporter", publicUserFields).sort({ createdAt: -1 }) : []
+            isAdmin ? Report.find({ reported: user._id }).populate("reporter", publicUserFields).sort({ createdAt: -1 }) : [],
+            canViewDetails
+                ? GameStatus.find({ user: user._id })
+                    .select("game status updatedAt")
+                    .populate("game", "name image genre")
+                    .sort({ updatedAt: -1 })
+                : []
         ]);
 
         res.status(200).json({
@@ -107,6 +114,8 @@ export const getPublicProfile = async (req, res, next) => {
                 ...(await getFollowStats(user._id)),
                 followers: canViewDetails || isAdmin ? followers.map(item => item.follower) : [],
                 following: canViewDetails || isAdmin ? following.map(item => item.following) : [],
+                library: library.filter(item => item.game),
+                libraryMessage: canViewDetails ? "" : "Only followers can view this user's library.",
                 pendingRequests,
                 blockedUsers: blockedByUser,
                 reports

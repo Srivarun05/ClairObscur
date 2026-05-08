@@ -230,6 +230,56 @@ body[data-theme="light"] .profile-accent-surface {
   gap: 24px;
 }
 
+.profile-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.profile-library-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-main);
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  min-height: 92px;
+  overflow: hidden;
+}
+
+.profile-library-card img {
+  width: 76px;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-library-card div {
+  min-width: 0;
+  padding: 12px;
+}
+
+.profile-library-card h3 {
+  color: var(--text-main);
+  font-size: 16px;
+  margin: 0 0 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-library-card span {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  color: var(--text-muted);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 6px 9px;
+  text-transform: uppercase;
+}
+
 .social-list-row {
   display: flex;
   justify-content: space-between;

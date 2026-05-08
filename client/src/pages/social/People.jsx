@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Check, Lock, Search, UserPlus, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Api from '../../Api';
+import BackButton from '../../components/common/BackButton';
 import TopNav from '../../components/layout/TopNav';
 import { getImageUrl } from '../../config';
 import { getSocket } from '../../socket';
@@ -63,6 +64,7 @@ const People = () => {
     <div className="steam-dashboard">
       <TopNav />
       <main className="dashboard-main">
+        <BackButton fallbackTo="/home" />
         <div className="social-header">
           <div>
             <h1>People</h1>
