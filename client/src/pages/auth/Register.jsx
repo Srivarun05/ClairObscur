@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Api from '../../Api';
 import { User, AtSign, Lock, Rocket, PieChart } from 'lucide-react';
 import bgImage from '../../assets/registerBG.png';
+import ThemeToggle from '../../components/common/ThemeToggle';
 import '../../styles/auth.css';
 
 const Register = () => {
@@ -43,7 +44,10 @@ const Register = () => {
     }}>
       <header className="header">
         <div className="logo"><PieChart size={28} /> CrateOn</div>
-        <button className="header-btn" onClick={() => navigate('/login')}>Sign In</button>
+        <div className="auth-header-actions">
+          <ThemeToggle />
+          <button className="header-btn" onClick={() => navigate('/login')}>Sign In</button>
+        </div>
       </header>
 
       <main className="main-content">

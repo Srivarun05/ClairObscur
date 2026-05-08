@@ -5,6 +5,7 @@ import Api from '../../Api';
 import TopNav from '../../components/layout/TopNav';
 import { getImageUrl } from '../../config';
 import { getSocket } from '../../socket';
+import { extractAccentColor } from '../../utils/extractAccentColor';
 import '../../styles/social.css';
 
 const PublicProfile = () => {
@@ -14,6 +15,7 @@ const PublicProfile = () => {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [reportMessage, setReportMessage] = useState('');
+  const [profileAccent, setProfileAccent] = useState(null);
 
   const loadProfile = useCallback(async () => {
     const response = await Api.get(`/social/profiles/${userId}`);
@@ -23,6 +25,24 @@ const PublicProfile = () => {
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
+
+  useEffect(() => {
+    let isCurrent = true;
+    const profileImage = profile?.user?.profilePic ? getImageUrl(profile.user.profilePic) : '';
+
+    if (!profileImage) {
+      setProfileAccent(null);
+      return undefined;
+    }
+
+    extractAccentColor(profileImage).then((accent) => {
+      if (isCurrent) setProfileAccent(accent);
+    });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [profile?.user?.profilePic]);
 
   useEffect(() => {
     const socket = getSocket();
@@ -68,12 +88,13 @@ const PublicProfile = () => {
   if (!profile) return null;
 
   const { user, relationship, followersCount, followingCount, followers, following, canViewDetails } = profile;
+  const profileAccentStyle = profileAccent ? { '--profile-accent': profileAccent } : undefined;
 
   return (
     <div className="steam-dashboard">
       <TopNav />
       <main className="dashboard-main">
-        <section className="public-profile-card">
+        <section className="public-profile-card profile-accent-surface" style={profileAccentStyle}>
           <div className="public-profile-avatar">
             {user.profilePic ? <img src={getImageUrl(user.profilePic)} alt={user.username} /> : user.username?.[0]?.toUpperCase()}
           </div>
@@ -115,16 +136,16 @@ const PublicProfile = () => {
         {reportMessage && <div className="social-inline-message">{reportMessage}</div>}
 
         {!canViewDetails ? (
-          <div className="social-panel private-profile-note">
+          <div className="social-panel private-profile-note profile-accent-surface" style={profileAccentStyle}>
             <Lock size={20} /> This profile is private. Follow request approval is required.
           </div>
         ) : (
           <section className="social-two-col">
-            <div className="social-panel">
+            <div className="social-panel profile-accent-surface" style={profileAccentStyle}>
               <div className="social-panel-title">Followers</div>
               {followers.map(item => <p key={item._id} className="social-muted">{item.username}</p>)}
             </div>
-            <div className="social-panel">
+            <div className="social-panel profile-accent-surface" style={profileAccentStyle}>
               <div className="social-panel-title">Following</div>
               {following.map(item => <p key={item._id} className="social-muted">{item.username}</p>)}
             </div>

@@ -3,6 +3,7 @@ import { X, Upload, User as UserIcon, Edit2 } from 'lucide-react';
 import Api from '../../Api';
 import { useAuth } from '../../context/AuthContext';
 import { getImageUrl } from '../../config';
+import { extractAccentColor } from '../../utils/extractAccentColor';
 import '../../styles/profile.css';
 
 const UserProfileModal = ({ isOpen, onClose }) => {
@@ -13,6 +14,7 @@ const UserProfileModal = ({ isOpen, onClose }) => {
   const [profileVisibility, setProfileVisibility] = useState('public');
   const [profilePic, setProfilePic] = useState(null);
   const [previewImage, setPreviewImage] = useState('');
+  const [profileAccent, setProfileAccent] = useState(null);
   
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -24,6 +26,23 @@ const UserProfileModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    let isCurrent = true;
+
+    if (!previewImage) {
+      setProfileAccent(null);
+      return undefined;
+    }
+
+    extractAccentColor(previewImage).then((accent) => {
+      if (isCurrent) setProfileAccent(accent);
+    });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [previewImage]);
+
   const fetchUserProfile = async () => {
     try {
       const response = await Api.get('/users/profile'); 
@@ -33,6 +52,8 @@ const UserProfileModal = ({ isOpen, onClose }) => {
       setProfileVisibility(userData.profileVisibility || 'public');
       if (userData.profilePic) {
         setPreviewImage(getImageUrl(userData.profilePic));
+      } else {
+        setPreviewImage('');
       }
     } catch (error) {
       console.error("Failed to fetch profile", error);
@@ -84,9 +105,11 @@ const UserProfileModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  const profileAccentStyle = profileAccent ? { '--profile-accent': profileAccent } : undefined;
+
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="profile-modal-content" onClick={e => e.stopPropagation()}>
+      <div className="profile-modal-content profile-accent-modal" style={profileAccentStyle} onClick={e => e.stopPropagation()}>
         <button className="close-modal-btn" onClick={onClose}>
           <X size={20} />
         </button>

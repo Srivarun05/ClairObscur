@@ -88,7 +88,7 @@ const People = () => {
                 <div>
                   <h3>{user.username}</h3>
                   <p>{user.followersCount} followers | {user.followingCount} following</p>
-                  <span>{user.profileVisibility === 'private' && <Lock size={12} />} {user.relationship}</span>
+                  <span>{user.profileVisibility === 'private' && <Lock size={12} />} {user.profileVisibility}</span>
                 </div>
               </button>
             ))}

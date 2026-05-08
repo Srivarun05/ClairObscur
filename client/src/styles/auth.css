@@ -52,6 +52,12 @@ body {
     border-bottom: none; 
 }
 
+.auth-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .logo { 
     display: flex; 
     align-items: center;
@@ -75,6 +81,27 @@ body {
 
 .header-btn:hover { 
     opacity: 0.9; 
+}
+
+.theme-toggle-button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    background: rgba(10, 10, 12, 0.55);
+    color: var(--text-main);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.theme-toggle-button:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.36);
+    transform: translateY(-1px);
 }
 
 .main-content { 
@@ -273,6 +300,87 @@ body {
     outline: none; 
     border-color: #4b5563; 
     background-color: #11131a; 
+}
+
+body[data-theme="light"] {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+}
+
+body[data-theme="light"] .auth-container {
+  color: var(--text-main);
+}
+
+body[data-theme="light"] .auth-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(212, 212, 212, 0.48);
+  pointer-events: none;
+}
+
+body[data-theme="light"] .auth-container > * {
+  position: relative;
+  z-index: 1;
+}
+
+body[data-theme="light"] .logo,
+body[data-theme="light"] .auth-title,
+body[data-theme="light"] .login-hero-text h1,
+body[data-theme="light"] .form-label {
+  color: var(--text-main);
+}
+
+body[data-theme="light"] .auth-subtitle,
+body[data-theme="light"] .login-hero-text p,
+body[data-theme="light"] .bottom-text {
+  color: var(--text-muted);
+}
+
+body[data-theme="light"] .auth-card {
+  background: color-mix(in srgb, var(--bg-card) 86%, transparent);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme="light"] .auth-card.register-mode {
+  background: color-mix(in srgb, var(--bg-card) 82%, transparent);
+  border-color: var(--border-color);
+}
+
+body[data-theme="light"] .form-input {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme="light"] .form-input:focus {
+  background: var(--bg-hover);
+  border-color: var(--accent-color);
+}
+
+body[data-theme="light"] .input-icon {
+  color: var(--text-muted);
+}
+
+body[data-theme="light"] .submit-btn,
+body[data-theme="light"] .header-btn {
+  background: var(--text-main);
+  color: var(--bg-main);
+}
+
+body[data-theme="light"] .auth-link {
+  color: var(--text-main);
+}
+
+body[data-theme="light"] .theme-toggle-button {
+  background: color-mix(in srgb, var(--bg-card) 78%, transparent);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+body[data-theme="light"] .theme-toggle-button:hover {
+  background: var(--bg-hover);
 }
 
 .error-msg { 

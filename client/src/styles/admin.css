@@ -338,6 +338,29 @@
   color: #fff;
 }
 
+.admin-dashboard .search-filter-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.admin-dashboard .search-input-wrapper {
+  position: relative;
+  width: min(100%, 320px);
+}
+
+.admin-dashboard .search-input-wrapper .search-icon {
+  left: 14px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.admin-dashboard .search-input-wrapper .search-input {
+  width: 100%;
+  padding-left: 42px;
+}
+
 .edit-user-btn {
   background: transparent;
   border: none;

@@ -1,9 +1,10 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { PieChart, User as UserIcon, LogOut, Menu, X, Heart, Library, Shield, Plus, Users, Sun, Moon, Bell } from 'lucide-react';
+import { PieChart, User as UserIcon, LogOut, Menu, X, Heart, Library, Shield, Plus, Users, Bell } from 'lucide-react';
 import UserProfileModal from '../dashboard/UserProfileModal'; 
 import Api from '../../Api';
+import ThemeToggle from '../common/ThemeToggle';
 import { disconnectSocket, getSocket } from '../../socket';
 
 const getImageUrl = (imagePath) => {
@@ -23,8 +24,6 @@ const TopNav = ({ onOpenCreateModal }) => {
   const [notifications, setNotifications] = useState([]);
   const notificationRef = useRef(null);
 
-  const [theme, setTheme] = useState(() => localStorage.getItem('crateon-theme') || 'dark');
-
   const loadNotifications = useCallback(async () => {
     if (!user) return;
 
@@ -35,16 +34,6 @@ const TopNav = ({ onOpenCreateModal }) => {
       setNotifications([]);
     }
   }, [user]);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    document.body.setAttribute('data-theme', theme);
-    localStorage.setItem('crateon-theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
-  };
 
   useEffect(() => {
     loadNotifications();
@@ -202,17 +191,7 @@ const TopNav = ({ onOpenCreateModal }) => {
             )}
           </div>
 
-          <button
-            type="button"
-            className="action-icon theme-toggle-btn desktop-only"
-            onClick={toggleTheme}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-            aria-pressed={theme === 'light'}
-            style={{ cursor: 'pointer', color: 'var(--text-muted)' }}
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
+          <ThemeToggle className="action-icon theme-toggle-btn desktop-only" />
 
           <button 
             className="user-profile-btn desktop-only" 
@@ -296,14 +275,7 @@ const TopNav = ({ onOpenCreateModal }) => {
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-pressed={theme === 'light'}
-            style={{ color: 'var(--text-muted)' }}
-          >
-            {theme === 'dark' ? <><Sun size={18} /> Light Mode</> : <><Moon size={18} /> Dark Mode</>}
-          </button>
+          <ThemeToggle className="mobile-theme-toggle" />
 
           <button onClick={() => navigateAndClose('/home')} style={{ color: 'var(--text-muted)' }}>
             <PieChart size={18} /> Dashboard

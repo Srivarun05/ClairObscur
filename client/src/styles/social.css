@@ -1,15 +1,27 @@
 .social-header,
 .public-profile-card,
 .social-panel {
-  background:
-    linear-gradient(135deg, color-mix(in srgb, #0ea5e9 8%, transparent), transparent 38%),
-    var(--bg-card);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   color: var(--text-main);
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: 0 12px 34px var(--shadow-color);
+}
+
+.profile-accent-surface {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--profile-accent, #0ea5e9) 18%, transparent), transparent 44%),
+    linear-gradient(165deg, color-mix(in srgb, var(--profile-accent, #0ea5e9) 7%, transparent), transparent 62%),
+    var(--bg-card);
+}
+
+body[data-theme="light"] .profile-accent-surface {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--profile-accent, #0ea5e9) 22%, transparent), transparent 44%),
+    linear-gradient(165deg, color-mix(in srgb, var(--profile-accent, #0ea5e9) 9%, transparent), transparent 60%),
+    var(--bg-card);
 }
 
 .social-header h1,
@@ -82,8 +94,14 @@
 
 .social-user-card:hover {
   background: var(--bg-hover);
-  border-color: #0ea5e9;
+  border-color: var(--border-color);
   transform: translateY(-2px);
+}
+
+.social-user-card:focus,
+.social-user-card:focus-visible {
+  border-color: var(--border-color);
+  outline: none;
 }
 
 .social-user-card h3 {

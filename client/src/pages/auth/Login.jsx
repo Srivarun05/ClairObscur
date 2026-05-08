@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Mail, Lock, ArrowRight, PieChart } from 'lucide-react';
 import libraryImage from '../../assets/Library.png'; 
 import bgImage from '../../assets/LibraryBlur.png'; 
+import ThemeToggle from '../../components/common/ThemeToggle';
 import '../../styles/auth.css';
 
 const Login = () => {
@@ -47,6 +48,7 @@ const Login = () => {
     }}>
       <header className="header no-border">
         <div className="logo"><PieChart size={28} /> CrateOn</div>
+        <ThemeToggle />
       </header>
 
       <main className="main-content">
