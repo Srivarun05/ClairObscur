@@ -38,9 +38,9 @@ const Login = () => {
       const message = err.response?.data?.message || 'Failed to login. Please try again.';
 
       if (message.toLowerCase().includes('email')) {
-        setError('Enter correct email');
+        setError('Kindly enter correct email address');
       } else if (message.toLowerCase().includes('password')) {
-        setError('Password entered wrong kindly enter correct password');
+        setError('Password entered is incorrect. Kindly enter the correct password');
       } else {
         setError(message);
       }

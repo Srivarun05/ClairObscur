@@ -58,7 +58,7 @@ export const login = async (req, res, next) => {
 
         if (!user) {
             res.status(401);
-            throw new Error("Enter correct email");
+            throw new Error("Kindly enter correct email address");
         }
 
         if (user.accountStatus === "blocked") {
@@ -81,7 +81,7 @@ export const login = async (req, res, next) => {
             });
         } else {
             res.status(401);
-            throw new Error("Password entered wrong kindly enter correct password");
+            throw new Error("Password entered is incorrect. Kindly enter the correct password");
         }
     } catch (error) {
         next(error);
