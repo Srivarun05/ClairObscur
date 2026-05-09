@@ -342,7 +342,8 @@ const Inbox = () => {
                           <span>{formatMessageTime(message.createdAt)}</span>
                           {reactions.length > 0 && (
                             <small className="inbox-reaction-pill">
-                              <Heart size={12} fill="currentColor" /> {reactions.length}
+                              <Heart size={12} fill="currentColor" />
+                              {reactions.length > 1 && <span>{reactions.length}</span>}
                             </small>
                           )}
                         </div>
