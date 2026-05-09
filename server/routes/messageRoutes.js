@@ -4,7 +4,8 @@ import {
     getInboxSummary,
     getMessages,
     markConversationRead,
-    sendMessage
+    sendMessage,
+    toggleMessageReaction
 } from "../controllers/messageController.js";
 import { protect } from "../middlewares/auth.js";
 
@@ -14,6 +15,7 @@ router.get("/summary", protect, getInboxSummary);
 router.get("/conversations", protect, getConversations);
 router.get("/conversations/:conversationId/messages", protect, getMessages);
 router.put("/conversations/:conversationId/read", protect, markConversationRead);
+router.put("/:messageId/reaction", protect, toggleMessageReaction);
 router.post("/", protect, sendMessage);
 
 export default router;

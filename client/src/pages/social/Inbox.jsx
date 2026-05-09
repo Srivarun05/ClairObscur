@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Inbox as InboxIcon, MessageCircle, Search, Send } from 'lucide-react';
+import { Heart, Inbox as InboxIcon, MessageCircle, Search, Send } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import Api from '../../Api';
 import { getImageUrl } from '../../config';
@@ -16,6 +16,8 @@ const formatMessageTime = (dateString) => {
   }).format(new Date(dateString));
 };
 
+const getUserId = (value) => value?._id || value;
+
 const Inbox = () => {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
@@ -29,6 +31,7 @@ const Inbox = () => {
   const [messageText, setMessageText] = useState('');
   const [loading, setLoading] = useState(true);
   const [tabCounts, setTabCounts] = useState({ messagesUnread: 0, requestsUnread: 0 });
+  const [lastTap, setLastTap] = useState({ messageId: null, time: 0 });
 
   const selectedUser = selectedConversation?.otherUser || draftRecipient;
   const requestedUserId = searchParams.get('user');
@@ -126,6 +129,10 @@ const Inbox = () => {
     });
   }, [activeTab]);
 
+  const upsertMessage = useCallback((updatedMessage) => {
+    setMessages(prev => prev.map(message => message._id === updatedMessage._id ? updatedMessage : message));
+  }, []);
+
   useEffect(() => {
     if (!user) return undefined;
 
@@ -145,12 +152,42 @@ const Inbox = () => {
 
     socket.on('message:new', handleIncoming);
     socket.on('message:sent', handleIncoming);
+    const handleReaction = ({ conversationId, message }) => {
+      if (selectedConversation?._id === conversationId) {
+        upsertMessage(message);
+      }
+    };
+
+    socket.on('message:reaction', handleReaction);
 
     return () => {
       socket.off('message:new', handleIncoming);
       socket.off('message:sent', handleIncoming);
+      socket.off('message:reaction', handleReaction);
     };
-  }, [loadSummary, selectedConversation?._id, upsertConversation, user]);
+  }, [loadSummary, selectedConversation?._id, upsertConversation, upsertMessage, user]);
+
+  const toggleReaction = async (messageId) => {
+    try {
+      const response = await Api.put(`/messages/${messageId}/reaction`);
+      upsertMessage(response.data.data.message);
+    } catch (error) {
+      console.error(error.response?.data?.message || 'Failed to react');
+    }
+  };
+
+  const handleBubbleTouchEnd = (messageId) => {
+    const now = Date.now();
+    const isDoubleTap = lastTap.messageId === messageId && now - lastTap.time < 320;
+
+    if (isDoubleTap) {
+      toggleReaction(messageId);
+      setLastTap({ messageId: null, time: 0 });
+      return;
+    }
+
+    setLastTap({ messageId, time: now });
+  };
 
   const sendMessage = async (event) => {
     event.preventDefault();
@@ -290,12 +327,24 @@ const Inbox = () => {
                   </div>
                 ) : (
                   messages.map(message => {
-                    const isMine = message.sender?._id === user?._id || message.sender === user?._id;
+                    const isMine = getUserId(message.sender) === user?._id;
+                    const reactions = message.reactions || [];
+                    const hasMyHeart = reactions.some(reaction => getUserId(reaction.user) === user?._id);
                     return (
                       <div key={message._id} className={`inbox-bubble-row ${isMine ? 'mine' : ''}`}>
-                        <div className="inbox-bubble">
+                        <div
+                          className={`inbox-bubble ${hasMyHeart ? 'reacted' : ''}`}
+                          onDoubleClick={() => toggleReaction(message._id)}
+                          onTouchEnd={() => handleBubbleTouchEnd(message._id)}
+                          title="Double tap to heart"
+                        >
                           <p>{message.text}</p>
                           <span>{formatMessageTime(message.createdAt)}</span>
+                          {reactions.length > 0 && (
+                            <small className="inbox-reaction-pill">
+                              <Heart size={12} fill="currentColor" /> {reactions.length}
+                            </small>
+                          )}
                         </div>
                       </div>
                     );

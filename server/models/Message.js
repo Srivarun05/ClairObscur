@@ -25,7 +25,23 @@ const messageSchema = new mongoose.Schema({
     readAt: {
         type: Date,
         default: null
-    }
+    },
+    reactions: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        },
+        type: {
+            type: String,
+            enum: ["heart"],
+            default: "heart"
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    }]
 }, { timestamps: true });
 
 messageSchema.index({ conversation: 1, createdAt: 1 });

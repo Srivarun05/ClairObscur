@@ -237,3 +237,44 @@ export const markConversationRead = async (req, res, next) => {
         next(error);
     }
 };
+
+export const toggleMessageReaction = async (req, res, next) => {
+    try {
+        const message = await Message.findById(req.params.messageId);
+
+        if (!message) {
+            res.status(404);
+            throw new Error("Message not found");
+        }
+
+        const conversation = await Conversation.findOne({
+            _id: message.conversation,
+            participants: req.user._id
+        });
+
+        if (!conversation) {
+            res.status(403);
+            throw new Error("You cannot react to this message");
+        }
+
+        const existingReactionIndex = message.reactions.findIndex(reaction => reaction.user.toString() === req.user._id.toString());
+
+        if (existingReactionIndex >= 0) {
+            message.reactions.splice(existingReactionIndex, 1);
+        } else {
+            message.reactions.push({ user: req.user._id, type: "heart" });
+        }
+
+        await message.save();
+        const populatedMessage = await Message.findById(message._id).populate("sender receiver reactions.user", publicUserFields);
+        const payload = { conversationId: conversation._id, message: populatedMessage };
+
+        conversation.participants.forEach(participantId => {
+            emitToUser(participantId, "message:reaction", payload);
+        });
+
+        res.status(200).json({ success: true, data: payload });
+    } catch (error) {
+        next(error);
+    }
+};

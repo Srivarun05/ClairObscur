@@ -271,8 +271,21 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 16px 16px 16px 4px;
+  cursor: pointer;
   max-width: min(560px, 78%);
   padding: 12px 14px 8px;
+  position: relative;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  user-select: none;
+}
+
+.inbox-bubble:hover,
+.inbox-bubble.reacted {
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.inbox-bubble:active {
+  transform: scale(0.985);
 }
 
 .inbox-bubble-row.mine .inbox-bubble {
@@ -298,6 +311,29 @@
 
 .inbox-bubble-row.mine .inbox-bubble span {
   color: color-mix(in srgb, var(--bg-main) 70%, transparent);
+}
+
+.inbox-reaction-pill {
+  align-items: center;
+  background: #ef4444;
+  border: 2px solid var(--bg-main);
+  border-radius: 999px;
+  bottom: -15px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 900;
+  gap: 3px;
+  line-height: 1;
+  min-height: 24px;
+  padding: 4px 7px;
+  position: absolute;
+  right: 10px;
+}
+
+.inbox-bubble-row.mine .inbox-reaction-pill {
+  left: 10px;
+  right: auto;
 }
 
 .inbox-composer {
