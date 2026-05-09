@@ -195,6 +195,39 @@ body[data-theme] .admin-action-btn:hover {
   color: var(--accent-text);
 }
 
+body[data-theme="dark"] .genre-checkbox-item.active {
+  background: color-mix(in srgb, var(--text-main) 8%, transparent);
+  border-radius: 6px;
+}
+
+body[data-theme="dark"] .genre-checkbox-item input[type="checkbox"] {
+  background: #050505;
+  border-color: #3f3f46;
+}
+
+body[data-theme="dark"] .genre-checkbox-item input[type="checkbox"]:checked {
+  background: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22);
+}
+
+body[data-theme="dark"] .genre-checkbox-item input[type="checkbox"]:checked::before {
+  background: #000000;
+}
+
+body[data-theme="dark"] .genre-checkbox-item.active label {
+  color: #ffffff;
+}
+
+body[data-theme="light"] .genre-checkbox-item input[type="checkbox"]:checked {
+  background: var(--text-main);
+  border-color: var(--text-main);
+}
+
+body[data-theme="light"] .genre-checkbox-item input[type="checkbox"]:checked::before {
+  background: var(--bg-main);
+}
+
 body[data-theme] .admin-action-btn,
 body[data-theme] .btn-cancel,
 body[data-theme] .genre-pill,
