@@ -281,7 +281,7 @@
 
 .inbox-bubble:hover,
 .inbox-bubble.reacted {
-  border-color: rgba(239, 68, 68, 0.45);
+  border-color: color-mix(in srgb, var(--text-main) 45%, var(--border-color));
 }
 
 .inbox-bubble:active {
@@ -315,11 +315,11 @@
 
 .inbox-reaction-pill {
   align-items: center;
-  background: #ef4444;
+  background: var(--text-main);
   border: 2px solid var(--bg-main);
   border-radius: 999px;
   bottom: -15px;
-  color: #fff;
+  color: var(--bg-main);
   display: inline-flex;
   font-size: 11px;
   font-weight: 900;

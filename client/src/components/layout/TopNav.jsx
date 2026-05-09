@@ -363,6 +363,10 @@ const TopNav = ({ onOpenCreateModal }) => {
             <PieChart size={18} /> Dashboard
           </button>
 
+          <button onClick={() => navigateAndClose('/people')} style={{ color: 'var(--text-muted)' }}>
+            <Users size={18} /> People
+          </button>
+
           <button onClick={() => navigateAndClose('/wishlist')} style={{ color: 'var(--text-muted)' }}>
             <Heart size={18} /> My Wishlist
           </button>

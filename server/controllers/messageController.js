@@ -38,8 +38,32 @@ const formatConversation = async (conversation, viewerId) => {
     };
 };
 
+const promoteRepliedRequests = async (userId) => {
+    const requestConversations = await Conversation.find({
+        participants: userId,
+        status: "request",
+        requester: { $ne: null }
+    }).select("_id requester");
+
+    await Promise.all(requestConversations.map(async (conversation) => {
+        const receiverReply = await Message.exists({
+            conversation: conversation._id,
+            sender: { $ne: conversation.requester }
+        });
+
+        if (receiverReply) {
+            await Conversation.updateOne(
+                { _id: conversation._id },
+                { status: "active" }
+            );
+        }
+    }));
+};
+
 export const getInboxSummary = async (req, res, next) => {
     try {
+        await promoteRepliedRequests(req.user._id);
+
         const [messageConversationIds, requestConversationIds] = await Promise.all([
             Conversation.find({
                 participants: req.user._id,
@@ -76,6 +100,8 @@ export const getInboxSummary = async (req, res, next) => {
 
 export const getConversations = async (req, res, next) => {
     try {
+        await promoteRepliedRequests(req.user._id);
+
         const box = req.query.box === "requests" ? "requests" : "messages";
         const search = (req.query.search || "").trim().toLowerCase();
         const filter = box === "requests"
@@ -110,6 +136,8 @@ export const getConversations = async (req, res, next) => {
 
 export const getMessages = async (req, res, next) => {
     try {
+        await promoteRepliedRequests(req.user._id);
+
         const conversation = await Conversation.findOne({
             _id: req.params.conversationId,
             participants: req.user._id
@@ -158,7 +186,7 @@ export const sendMessage = async (req, res, next) => {
             throw new Error("User not available");
         }
 
-        const status = await getRelationshipStatus(req.user._id, recipient._id);
+        const relationshipStatus = await getRelationshipStatus(req.user._id, recipient._id);
         const participantKey = getParticipantKey(req.user._id, recipient._id);
         let conversation = await Conversation.findOne({ participantKey });
 
@@ -166,12 +194,15 @@ export const sendMessage = async (req, res, next) => {
             conversation = await Conversation.create({
                 participants: [req.user._id, recipient._id],
                 participantKey,
-                status,
+                status: relationshipStatus,
                 requester: req.user._id
             });
         } else {
-            conversation.status = status;
-            if (status === "request" && !conversation.requester) {
+            const isRequestReceiverReply = conversation.status === "request" && conversation.requester?.toString() !== req.user._id.toString();
+            const nextStatus = conversation.status === "active" || isRequestReceiverReply ? "active" : relationshipStatus;
+
+            conversation.status = nextStatus;
+            if (nextStatus === "request" && !conversation.requester) {
                 conversation.requester = req.user._id;
             }
         }
