@@ -100,7 +100,7 @@ export const getPublicProfile = async (req, res, next) => {
             isAdmin ? Report.find({ reported: user._id }).populate("reporter", publicUserFields).sort({ createdAt: -1 }) : [],
             canViewDetails
                 ? GameStatus.find({ user: user._id })
-                    .select("game status updatedAt")
+                    .select("game status playTime startDate endDate ngPlus notes updatedAt")
                     .populate("game", "name image genre")
                     .sort({ updatedAt: -1 })
                 : [],

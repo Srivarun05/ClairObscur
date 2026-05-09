@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { BarChart3, Calendar, CheckCircle, Lock, Pause, Play, Target, XCircle } from 'lucide-react';
+import { BarChart3, Calendar, CheckCircle, Clock3, Lock, Pause, Play, RotateCcw, StickyNote, Target, X, XCircle } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import Api from '../../Api';
 import BackButton from '../../components/common/BackButton';
@@ -15,11 +15,23 @@ const STATUS_CATEGORIES = [
   { id: 'Dropped', icon: <XCircle size={18} />, color: '#fb7185' }
 ];
 
+const formatLibraryDate = (dateString) => {
+  if (!dateString) return 'Not set';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return 'Not set';
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }).format(date);
+};
+
 const ProfileLibrary = () => {
   const { userId } = useParams();
   const [profile, setProfile] = useState(null);
   const [activeTab, setActiveTab] = useState('Playing');
   const [hoveredSegment, setHoveredSegment] = useState(null);
+  const [selectedRecord, setSelectedRecord] = useState(null);
 
   const loadProfile = useCallback(async () => {
     const response = await Api.get(`/social/profiles/${userId}`);
@@ -181,12 +193,18 @@ const ProfileLibrary = () => {
                   const activeCategory = STATUS_CATEGORIES.find(category => category.id === item.status);
                   return (
                     <div key={item._id} className="library-card profile-readonly-library-card">
-                      <div className="library-card-click-area">
+                      <button
+                        className="library-card-click-area profile-library-detail-trigger"
+                        onClick={() => setSelectedRecord(item)}
+                        type="button"
+                        title={`View ${item.game.name} details`}
+                      >
                         <img src={getImageUrl(item.game.image)} alt={item.game.name} className="library-card-image" />
                         <div className="library-card-content">
                           <h3 className="library-card-title">{item.game.name}</h3>
+                          <span className="profile-library-view-detail">View details</span>
                         </div>
-                      </div>
+                      </button>
                       <div className="library-card-actions">
                         <span
                           className="profile-library-status-pill"
@@ -207,6 +225,64 @@ const ProfileLibrary = () => {
           </>
         )}
       </main>
+
+      {selectedRecord && (
+        <div className="modal-overlay" onClick={() => setSelectedRecord(null)} style={{ zIndex: 3000 }}>
+          <div className="profile-library-detail-modal" onClick={event => event.stopPropagation()}>
+            <div
+              className="profile-library-detail-hero"
+              style={{ backgroundImage: `url(${getImageUrl(selectedRecord.game.image)})` }}
+            >
+              <div className="profile-library-detail-shade" />
+              <button
+                className="tracker-close-btn"
+                onClick={() => setSelectedRecord(null)}
+                type="button"
+                aria-label="Close details"
+              >
+                <X size={20} />
+              </button>
+              <div className="profile-library-detail-heading">
+                <img src={getImageUrl(selectedRecord.game.image)} alt={selectedRecord.game.name} />
+                <div>
+                  <p>{user.username}'s tracking details</p>
+                  <h2>{selectedRecord.game.name}</h2>
+                </div>
+              </div>
+            </div>
+
+            <div className="profile-library-detail-body">
+              <div className="profile-library-detail-grid">
+                <div className="profile-library-detail-field">
+                  <span>Status</span>
+                  <strong>{selectedRecord.status}</strong>
+                </div>
+                <div className="profile-library-detail-field">
+                  <span><Clock3 size={15} /> Play Time</span>
+                  <strong>{selectedRecord.playTime ?? 0} hours</strong>
+                </div>
+                <div className="profile-library-detail-field">
+                  <span><RotateCcw size={15} /> NG+</span>
+                  <strong>{selectedRecord.ngPlus ?? 0}</strong>
+                </div>
+                <div className="profile-library-detail-field">
+                  <span><Calendar size={15} /> Start Date</span>
+                  <strong>{formatLibraryDate(selectedRecord.startDate)}</strong>
+                </div>
+                <div className="profile-library-detail-field">
+                  <span><CheckCircle size={15} /> Finish Date</span>
+                  <strong>{formatLibraryDate(selectedRecord.endDate)}</strong>
+                </div>
+              </div>
+
+              <div className="profile-library-detail-notes">
+                <span><StickyNote size={15} /> Personal Notes</span>
+                <p>{selectedRecord.notes?.trim() || 'No notes added.'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
