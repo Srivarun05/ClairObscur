@@ -14,6 +14,7 @@ import ratingRoutes from "./routes/ratingRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import statusRoutes from "./routes/statusRoutes.js";
 import socialRoutes from "./routes/socialRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
 import { initializeSocket } from "./utils/socket.js";
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.use("/api/ratings", ratingRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/status", statusRoutes);
 app.use("/api/social", socialRoutes);
+app.use("/api/messages", messageRoutes);
 
 
 const __filename = fileURLToPath(import.meta.url);

@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { PieChart, User as UserIcon, LogOut, Menu, X, Heart, Library, Shield, Plus, Users, Bell } from 'lucide-react';
+import { PieChart, User as UserIcon, LogOut, Menu, X, Heart, Library, Shield, Plus, Users, Bell, MessageCircle } from 'lucide-react';
 import UserProfileModal from '../dashboard/UserProfileModal'; 
 import Api from '../../Api';
 import ThemeToggle from '../common/ThemeToggle';
@@ -22,6 +22,7 @@ const TopNav = ({ onOpenCreateModal }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [messageSummary, setMessageSummary] = useState({ totalUnread: 0 });
   const notificationRef = useRef(null);
 
   const loadNotifications = useCallback(async () => {
@@ -34,6 +35,29 @@ const TopNav = ({ onOpenCreateModal }) => {
       setNotifications([]);
     }
   }, [user]);
+
+  const loadMessageSummary = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const response = await Api.get('/messages/summary');
+      setMessageSummary(response.data.data || { totalUnread: 0 });
+    } catch {
+      setMessageSummary({ totalUnread: 0 });
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadMessageSummary();
+  }, [loadMessageSummary]);
+
+  useEffect(() => {
+    window.addEventListener('messages:refresh', loadMessageSummary);
+
+    return () => {
+      window.removeEventListener('messages:refresh', loadMessageSummary);
+    };
+  }, [loadMessageSummary]);
 
   useEffect(() => {
     loadNotifications();
@@ -54,13 +78,17 @@ const TopNav = ({ onOpenCreateModal }) => {
     };
 
     socket.on('notification:new', handleNewNotification);
+    socket.on('message:new', loadMessageSummary);
+    socket.on('message:sent', loadMessageSummary);
     socket.on('connect', loadNotifications);
 
     return () => {
       socket.off('notification:new', handleNewNotification);
+      socket.off('message:new', loadMessageSummary);
+      socket.off('message:sent', loadMessageSummary);
       socket.off('connect', loadNotifications);
     };
-  }, [loadNotifications, user]);
+  }, [loadMessageSummary, loadNotifications, user]);
 
   const unreadCount = notifications.filter(notification => !notification.isRead).length;
 
@@ -154,6 +182,18 @@ const TopNav = ({ onOpenCreateModal }) => {
             <button
               type="button"
               className="action-icon theme-toggle-btn notification-toggle-btn"
+              onClick={() => navigate('/inbox')}
+              title="Messages"
+              aria-label="Messages"
+              style={{ cursor: 'pointer', color: location.pathname === '/inbox' ? 'var(--text-main)' : 'var(--text-muted)' }}
+            >
+              <MessageCircle size={19} />
+              {messageSummary.totalUnread > 0 && <span className="notification-badge">{messageSummary.totalUnread > 9 ? '9+' : messageSummary.totalUnread}</span>}
+            </button>
+
+            <button
+              type="button"
+              className="action-icon theme-toggle-btn notification-toggle-btn"
               onClick={toggleNotifications}
               title="Notifications"
               aria-label="Notifications"
@@ -239,6 +279,14 @@ const TopNav = ({ onOpenCreateModal }) => {
                <UserIcon size={20} />
             )}
             <span>{user?.username ? user.username : 'My Profile'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigateAndClose('/inbox')}
+            style={{ color: 'var(--text-muted)' }}
+          >
+            <MessageCircle size={18} /> Messages {messageSummary.totalUnread > 0 ? `(${messageSummary.totalUnread})` : ''}
           </button>
 
           <button

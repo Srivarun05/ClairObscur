@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Gamepad2, Lock, Settings, ShieldAlert, UserMinus, UserPlus } from 'lucide-react';
+import { Gamepad2, Lock, MessageCircle, Settings, ShieldAlert, UserMinus, UserPlus } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Api from '../../Api';
 import BackButton from '../../components/common/BackButton';
@@ -110,6 +110,11 @@ const PublicProfile = () => {
             <button type="button" onClick={() => navigate(`/profile/${userId}/library`)}>
               <Gamepad2 size={16} /> Library
             </button>
+            {relationship !== 'self' && (
+              <button type="button" onClick={() => navigate(`/inbox?user=${userId}`)}>
+                <MessageCircle size={16} /> Message
+              </button>
+            )}
             {relationship === 'accepted' ? (
               <button onClick={unfollow}><UserMinus size={16} /> Unfollow</button>
             ) : relationship === 'pending' ? (
