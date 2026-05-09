@@ -20,7 +20,7 @@
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
-  min-height: 96px;
+  min-height: 82px;
   padding: 20px 22px;
 }
 
@@ -41,10 +41,19 @@
 .inbox-search {
   align-items: center;
   background: color-mix(in srgb, var(--bg-input) 86%, var(--text-main));
+  border: 1px solid transparent;
+  border-radius: 999px;
   color: var(--text-muted);
   display: flex;
   gap: 14px;
-  padding: 16px 22px;
+  margin: 14px 16px;
+  padding: 14px 20px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.inbox-search:focus-within {
+  background: var(--bg-input);
+  border-color: var(--accent-color);
 }
 
 .inbox-search input {
@@ -65,12 +74,16 @@
 }
 
 .inbox-tabs button {
+  align-items: center;
   background: transparent;
   border: 0;
   color: var(--text-muted);
   cursor: pointer;
+  display: inline-flex;
   font-size: 20px;
   font-weight: 900;
+  gap: 8px;
+  justify-content: center;
   padding: 16px 6px;
   position: relative;
 }
@@ -87,6 +100,21 @@
   left: 20%;
   position: absolute;
   right: 20%;
+}
+
+.inbox-tab-badge {
+  background: #ef4444;
+  border: 1px solid var(--bg-main);
+  border-radius: 999px;
+  color: #fff;
+  display: inline-grid;
+  font-size: 10px;
+  font-weight: 900;
+  height: 18px;
+  line-height: 1;
+  min-width: 18px;
+  padding: 0 5px;
+  place-items: center;
 }
 
 .inbox-list {

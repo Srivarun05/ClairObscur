@@ -8,6 +8,11 @@ const publicUserFields = "username email profilePic role profileVisibility accou
 
 const getParticipantKey = (userA, userB) => [userA.toString(), userB.toString()].sort().join(":");
 
+const getConversationBox = (conversation, viewerId) => {
+    if (conversation.status === "active") return "messages";
+    return conversation.requester?.toString() === viewerId.toString() ? "messages" : "requests";
+};
+
 const getRelationshipStatus = async (senderId, receiverId) => {
     const [senderFollowsReceiver, receiverFollowsSender] = await Promise.all([
         Follow.findOne({ follower: senderId, following: receiverId, status: "accepted" }),
@@ -35,20 +40,31 @@ const formatConversation = async (conversation, viewerId) => {
 
 export const getInboxSummary = async (req, res, next) => {
     try {
+        const [messageConversationIds, requestConversationIds] = await Promise.all([
+            Conversation.find({
+                participants: req.user._id,
+                $or: [
+                    { status: "active" },
+                    { status: "request", requester: req.user._id }
+                ]
+            }).distinct("_id"),
+            Conversation.find({
+                participants: req.user._id,
+                status: "request",
+                requester: { $ne: req.user._id }
+            }).distinct("_id")
+        ]);
+
         const [messagesUnread, requestsUnread] = await Promise.all([
             Message.countDocuments({
                 receiver: req.user._id,
                 readAt: null,
-                conversation: {
-                    $in: await Conversation.find({ participants: req.user._id, status: "active" }).distinct("_id")
-                }
+                conversation: { $in: messageConversationIds }
             }),
             Message.countDocuments({
                 receiver: req.user._id,
                 readAt: null,
-                conversation: {
-                    $in: await Conversation.find({ participants: req.user._id, status: "request" }).distinct("_id")
-                }
+                conversation: { $in: requestConversationIds }
             })
         ]);
 
@@ -63,8 +79,14 @@ export const getConversations = async (req, res, next) => {
         const box = req.query.box === "requests" ? "requests" : "messages";
         const search = (req.query.search || "").trim().toLowerCase();
         const filter = box === "requests"
-            ? { participants: req.user._id, status: "request" }
-            : { participants: req.user._id, status: "active" };
+            ? { participants: req.user._id, status: "request", requester: { $ne: req.user._id } }
+            : {
+                participants: req.user._id,
+                $or: [
+                    { status: "active" },
+                    { status: "request", requester: req.user._id }
+                ]
+            };
 
         const conversations = await Conversation.find(filter)
             .populate("participants", publicUserFields)
@@ -176,12 +198,12 @@ export const sendMessage = async (req, res, next) => {
         const receiverPayload = {
             conversation: await formatConversation(populatedConversation, recipient._id),
             message: populatedMessage,
-            box: status === "active" ? "messages" : "requests"
+            box: getConversationBox(populatedConversation, recipient._id)
         };
         const senderPayload = {
             conversation: await formatConversation(populatedConversation, req.user._id),
             message: populatedMessage,
-            box: status === "active" ? "messages" : "requests"
+            box: getConversationBox(populatedConversation, req.user._id)
         };
 
         emitToUser(recipient._id, "message:new", receiverPayload);

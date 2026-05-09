@@ -106,6 +106,20 @@ const TopNav = ({ onOpenCreateModal }) => {
     setIsMobileMenuOpen(false);
   };
 
+  const dismissNotification = async (event, notificationId) => {
+    event.stopPropagation();
+
+    const previousNotifications = notifications;
+    setNotifications(prev => prev.filter(notification => notification._id !== notificationId));
+
+    try {
+      await Api.delete(`/social/notifications/${notificationId}`);
+    } catch (error) {
+      setNotifications(previousNotifications);
+      console.error('Failed to remove notification', error);
+    }
+  };
+
   const toggleNotifications = async () => {
     setIsNotificationsOpen(prev => !prev);
     if (unreadCount > 0) {
@@ -178,19 +192,19 @@ const TopNav = ({ onOpenCreateModal }) => {
         </div>
 
         <div className="header-right">
-          <div className="notification-wrapper desktop-only" ref={notificationRef}>
-            <button
-              type="button"
-              className="action-icon theme-toggle-btn notification-toggle-btn"
-              onClick={() => navigate('/inbox')}
-              title="Messages"
-              aria-label="Messages"
-              style={{ cursor: 'pointer', color: location.pathname === '/inbox' ? 'var(--text-main)' : 'var(--text-muted)' }}
-            >
-              <MessageCircle size={19} />
-              {messageSummary.totalUnread > 0 && <span className="notification-badge">{messageSummary.totalUnread > 9 ? '9+' : messageSummary.totalUnread}</span>}
-            </button>
+          <button
+            type="button"
+            className="action-icon theme-toggle-btn notification-toggle-btn desktop-only"
+            onClick={() => navigate('/inbox')}
+            title="Messages"
+            aria-label="Messages"
+            style={{ cursor: 'pointer', color: location.pathname === '/inbox' ? 'var(--text-main)' : 'var(--text-muted)' }}
+          >
+            <MessageCircle size={19} />
+            {messageSummary.totalUnread > 0 && <span className="notification-badge">{messageSummary.totalUnread > 9 ? '9+' : messageSummary.totalUnread}</span>}
+          </button>
 
+          <div className="notification-wrapper desktop-only" ref={notificationRef}>
             <button
               type="button"
               className="action-icon theme-toggle-btn notification-toggle-btn"
@@ -210,21 +224,31 @@ const TopNav = ({ onOpenCreateModal }) => {
                   <p>No notifications yet.</p>
                 ) : (
                   notifications.slice(0, 8).map(notification => (
-                    <button
-                      type="button"
-                      className="notification-item"
-                      key={notification._id}
-                      onClick={() => openNotification(notification)}
-                    >
-                      <span className="notification-avatar">
-                        {notification.actor?.profilePic ? (
-                          <img src={getImageUrl(notification.actor.profilePic)} alt={notification.actor.username || 'User'} />
-                        ) : (
-                          notification.actor?.username?.[0]?.toUpperCase() || '!'
-                        )}
-                      </span>
-                      <span>{notification.message}</span>
-                    </button>
+                    <div className="notification-item" key={notification._id}>
+                      <button
+                        type="button"
+                        className="notification-open-btn"
+                        onClick={() => openNotification(notification)}
+                      >
+                        <span className="notification-avatar">
+                          {notification.actor?.profilePic ? (
+                            <img src={getImageUrl(notification.actor.profilePic)} alt={notification.actor.username || 'User'} />
+                          ) : (
+                            notification.actor?.username?.[0]?.toUpperCase() || '!'
+                          )}
+                        </span>
+                        <span>{notification.message}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="notification-dismiss-btn"
+                        onClick={(event) => dismissNotification(event, notification._id)}
+                        aria-label="Remove notification"
+                        title="Remove"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
                   ))
                 )}
               </div>
@@ -303,21 +327,31 @@ const TopNav = ({ onOpenCreateModal }) => {
                 <p>No notifications yet.</p>
               ) : (
                 notifications.slice(0, 5).map(notification => (
-                  <button
-                    type="button"
-                    className="notification-item"
-                    key={notification._id}
-                    onClick={() => openNotification(notification)}
-                  >
-                    <span className="notification-avatar">
-                      {notification.actor?.profilePic ? (
-                        <img src={getImageUrl(notification.actor.profilePic)} alt={notification.actor.username || 'User'} />
-                      ) : (
-                        notification.actor?.username?.[0]?.toUpperCase() || '!'
-                      )}
-                    </span>
-                    <span>{notification.message}</span>
-                  </button>
+                  <div className="notification-item" key={notification._id}>
+                    <button
+                      type="button"
+                      className="notification-open-btn"
+                      onClick={() => openNotification(notification)}
+                    >
+                      <span className="notification-avatar">
+                        {notification.actor?.profilePic ? (
+                          <img src={getImageUrl(notification.actor.profilePic)} alt={notification.actor.username || 'User'} />
+                        ) : (
+                          notification.actor?.username?.[0]?.toUpperCase() || '!'
+                        )}
+                      </span>
+                      <span>{notification.message}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="notification-dismiss-btn"
+                      onClick={(event) => dismissNotification(event, notification._id)}
+                      aria-label="Remove notification"
+                      title="Remove"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
                 ))
               )}
             </div>

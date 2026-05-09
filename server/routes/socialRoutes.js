@@ -1,6 +1,7 @@
 import express from "express";
 import {
   blockUser,
+  deleteNotification,
   discoverUsers,
   followUser,
   getAdminSocialOverview,
@@ -30,6 +31,7 @@ router.put("/requests/:requestId", protect, respondToFollowRequest);
 
 router.get("/notifications", protect, getNotifications);
 router.put("/notifications/read", protect, markNotificationsRead);
+router.delete("/notifications/:notificationId", protect, deleteNotification);
 
 router.get("/admin/overview", protect, adminOnly, getAdminSocialOverview);
 router.get("/admin/reports", protect, adminOnly, getAdminReports);

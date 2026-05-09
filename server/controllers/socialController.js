@@ -252,6 +252,24 @@ export const markNotificationsRead = async (req, res, next) => {
     }
 };
 
+export const deleteNotification = async (req, res, next) => {
+    try {
+        const notification = await Notification.findOneAndDelete({
+            _id: req.params.notificationId,
+            recipient: req.user._id
+        });
+
+        if (!notification) {
+            res.status(404);
+            throw new Error("Notification not found");
+        }
+
+        res.status(200).json({ success: true, message: "Notification removed" });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const reportUser = async (req, res, next) => {
     try {
         const reason = (req.body.reason || "").trim();

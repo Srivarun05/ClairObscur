@@ -1411,7 +1411,6 @@ body[data-theme] .mobile-notification-list p {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-main);
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1425,6 +1424,45 @@ body[data-theme] .mobile-notification-list p {
 
 body[data-theme] .notification-item:hover {
   background: var(--bg-hover);
+}
+
+body[data-theme] .notification-open-btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+body[data-theme] .notification-open-btn > span:last-child {
+  flex: 1;
+  min-width: 0;
+}
+
+body[data-theme] .notification-dismiss-btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 26px;
+  justify-content: center;
+  padding: 0;
+  width: 26px;
+}
+
+body[data-theme] .notification-dismiss-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
 }
 
 body[data-theme] .notification-avatar {

@@ -28,6 +28,7 @@ const Inbox = () => {
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState('');
   const [loading, setLoading] = useState(true);
+  const [tabCounts, setTabCounts] = useState({ messagesUnread: 0, requestsUnread: 0 });
 
   const selectedUser = selectedConversation?.otherUser || draftRecipient;
   const requestedUserId = searchParams.get('user');
@@ -60,9 +61,22 @@ const Inbox = () => {
     }
   }, [search, user?._id]);
 
+  const loadSummary = useCallback(async () => {
+    try {
+      const response = await Api.get('/messages/summary');
+      setTabCounts(response.data.data || { messagesUnread: 0, requestsUnread: 0 });
+    } catch {
+      setTabCounts({ messagesUnread: 0, requestsUnread: 0 });
+    }
+  }, []);
+
   useEffect(() => {
     loadConversations();
   }, [loadConversations]);
+
+  useEffect(() => {
+    loadSummary();
+  }, [loadSummary]);
 
   useEffect(() => {
     loadPeople();
@@ -97,6 +111,7 @@ const Inbox = () => {
       setMessages(response.data.data.messages || []);
       await Api.put(`/messages/conversations/${conversation._id}/read`);
       setConversations(prev => prev.map(item => item._id === conversation._id ? { ...item, unreadCount: 0 } : item));
+      loadSummary();
       window.dispatchEvent(new Event('messages:refresh'));
     } catch {
       setMessages([]);
@@ -119,9 +134,11 @@ const Inbox = () => {
 
     const handleIncoming = ({ conversation, message, box }) => {
       upsertConversation(conversation, box);
+      loadSummary();
       if (selectedConversation?._id === conversation._id) {
         setMessages(prev => prev.some(item => item._id === message._id) ? prev : [...prev, message]);
         Api.put(`/messages/conversations/${conversation._id}/read`).catch(() => {});
+        loadSummary();
         window.dispatchEvent(new Event('messages:refresh'));
       }
     };
@@ -133,7 +150,7 @@ const Inbox = () => {
       socket.off('message:new', handleIncoming);
       socket.off('message:sent', handleIncoming);
     };
-  }, [selectedConversation?._id, upsertConversation, user]);
+  }, [loadSummary, selectedConversation?._id, upsertConversation, user]);
 
   const sendMessage = async (event) => {
     event.preventDefault();
@@ -152,6 +169,7 @@ const Inbox = () => {
       setMessages(prev => prev.some(item => item._id === message._id) ? prev : [...prev, message]);
       upsertConversation(conversation, box);
       if (box !== activeTab) setActiveTab(box);
+      loadSummary();
       window.dispatchEvent(new Event('messages:refresh'));
     } catch (error) {
       setMessageText(text);
@@ -171,8 +189,7 @@ const Inbox = () => {
         <aside className="inbox-sidebar">
           <div className="inbox-title-row">
             <div>
-              <p>{user?.username}</p>
-              <h1>Inbox</h1>
+              <h1>{user?.username || 'Messages'}</h1>
             </div>
           </div>
 
@@ -192,6 +209,7 @@ const Inbox = () => {
               type="button"
             >
               Messages
+              {tabCounts.messagesUnread > 0 && <span className="inbox-tab-badge">{tabCounts.messagesUnread > 9 ? '9+' : tabCounts.messagesUnread}</span>}
             </button>
             <button
               className={activeTab === 'requests' ? 'active' : ''}
@@ -199,6 +217,7 @@ const Inbox = () => {
               type="button"
             >
               Requests
+              {tabCounts.requestsUnread > 0 && <span className="inbox-tab-badge">{tabCounts.requestsUnread > 9 ? '9+' : tabCounts.requestsUnread}</span>}
             </button>
           </div>
 
