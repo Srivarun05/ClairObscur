@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { BarChart3, Calendar, CheckCircle, Clock3, Lock, Pause, Play, RotateCcw, StickyNote, Target, X, XCircle } from 'lucide-react';
+import { ArrowRight, BarChart3, Calendar, CheckCircle, Clock3, Lock, Pause, Play, RotateCcw, StickyNote, Target, X, XCircle } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import Api from '../../Api';
 import BackButton from '../../components/common/BackButton';
@@ -202,7 +202,9 @@ const ProfileLibrary = () => {
                         <img src={getImageUrl(item.game.image)} alt={item.game.name} className="library-card-image" />
                         <div className="library-card-content">
                           <h3 className="library-card-title">{item.game.name}</h3>
-                          <span className="profile-library-view-detail">View details</span>
+                          <span className="profile-library-view-detail">
+                            View details <ArrowRight size={14} />
+                          </span>
                         </div>
                       </button>
                       <div className="library-card-actions">
