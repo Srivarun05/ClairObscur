@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Gamepad2, Lock, Settings, ShieldAlert, UserMinus, UserPlus } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Api from '../../Api';
 import BackButton from '../../components/common/BackButton';
 import TopNav from '../../components/layout/TopNav';
@@ -11,6 +11,7 @@ import '../../styles/social.css';
 
 const PublicProfile = () => {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
@@ -88,7 +89,7 @@ const PublicProfile = () => {
 
   if (!profile) return null;
 
-  const { user, relationship, followersCount, followingCount, followers, following, canViewDetails, library = [], libraryMessage } = profile;
+  const { user, relationship, followersCount, followingCount, followers, following, canViewDetails, libraryMessage } = profile;
   const profileAccentStyle = profileAccent ? { '--profile-accent': profileAccent } : undefined;
 
   return (
@@ -106,6 +107,9 @@ const PublicProfile = () => {
             <span className="profile-visibility">{user.profileVisibility === 'private' && <Lock size={13} />} {user.profileVisibility}</span>
           </div>
           <div className="profile-actions">
+            <button type="button" onClick={() => navigate(`/profile/${userId}/library`)}>
+              <Gamepad2 size={16} /> Library
+            </button>
             {relationship === 'accepted' ? (
               <button onClick={unfollow}><UserMinus size={16} /> Unfollow</button>
             ) : relationship === 'pending' ? (
@@ -143,25 +147,6 @@ const PublicProfile = () => {
           </div>
         ) : (
           <>
-            <section className="social-panel profile-accent-surface" style={profileAccentStyle}>
-              <div className="social-panel-title"><Gamepad2 size={18} /> Library</div>
-              {library.length === 0 ? (
-                <p className="social-muted">No games tracked yet.</p>
-              ) : (
-                <div className="profile-library-grid">
-                  {library.map(item => (
-                    <article className="profile-library-card" key={item._id}>
-                      <img src={getImageUrl(item.game.image)} alt={item.game.name} />
-                      <div>
-                        <h3>{item.game.name}</h3>
-                        <span>{item.status}</span>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </section>
-
             <section className="social-two-col">
               <div className="social-panel profile-accent-surface" style={profileAccentStyle}>
                 <div className="social-panel-title">Followers</div>

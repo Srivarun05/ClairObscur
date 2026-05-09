@@ -14,6 +14,7 @@ const Wishlist = lazy(() => import('./pages/dashboard/Wishlist'));
 const MyStatus = lazy(() => import('./pages/dashboard/MyStatus'));
 const People = lazy(() => import('./pages/social/People'));
 const PublicProfile = lazy(() => import('./pages/social/PublicProfile'));
+const ProfileLibrary = lazy(() => import('./pages/social/ProfileLibrary'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const ManageUsers = lazy(() => import('./pages/admin/ManageUsers'));
 const AdminUserLibrary = lazy(() => import('./pages/admin/AdminUserLibrary'));
@@ -90,6 +91,7 @@ function App() {
               <Route path="/status" element={<MyStatus />} />
               <Route path="/people" element={<People />} />
               <Route path="/profile/:userId" element={<PublicProfile />} />
+              <Route path="/profile/:userId/library" element={<ProfileLibrary />} />
               {/* <Route path="/game/:id" element={<GameDetails />} /> */}
             </Route>
 

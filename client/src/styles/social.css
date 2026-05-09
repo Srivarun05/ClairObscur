@@ -280,6 +280,61 @@ body[data-theme="light"] .profile-accent-surface {
   text-transform: uppercase;
 }
 
+.profile-library-view {
+  margin-bottom: 24px;
+}
+
+.profile-readonly-library-card .library-card-click-area {
+  cursor: default;
+}
+
+.profile-readonly-library-card:hover {
+  border-color: var(--border-color);
+}
+
+.profile-library-status-pill {
+  border: 1px solid;
+  border-radius: 8px;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  justify-content: center;
+  letter-spacing: 0.6px;
+  padding: 9px 12px;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.profile-library-header {
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 12px 34px var(--shadow-color);
+  color: var(--text-main);
+  display: flex;
+  gap: 18px;
+  margin-bottom: 24px;
+  padding: 22px 24px;
+}
+
+.profile-library-owner-avatar {
+  flex: 0 0 auto;
+  height: 64px;
+  width: 64px;
+}
+
+.profile-library-header h1 {
+  font-size: 34px;
+  line-height: 1;
+  margin: 0 0 8px;
+}
+
+.profile-library-header p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
 .social-list-row {
   display: flex;
   justify-content: space-between;

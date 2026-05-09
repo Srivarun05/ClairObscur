@@ -4,6 +4,7 @@ import Notification from "../models/Notification.js";
 import Block from "../models/Block.js";
 import Report from "../models/Report.js";
 import GameStatus from "../models/GameStatus.js";
+import Game from "../models/Game.js";
 import { emitNotification, emitToAdmins, emitToUser, getOnlineUserIds } from "../utils/socket.js";
 
 const publicUserFields = "username email profilePic role profileVisibility accountStatus isOnline lastSeen createdAt";
@@ -91,7 +92,7 @@ export const getPublicProfile = async (req, res, next) => {
         const relationship = await getRelationship(req.user?._id, user._id);
         const isAdmin = req.user?.role === "admin";
         const canViewDetails = isAdmin || user.profileVisibility === "public" || relationship === "accepted" || relationship === "self";
-        const [followers, following, pendingRequests, blockedByUser, reports, library] = await Promise.all([
+        const [followers, following, pendingRequests, blockedByUser, reports, library, totalGames] = await Promise.all([
             Follow.find({ following: user._id, status: "accepted" }).populate("follower", publicUserFields),
             Follow.find({ follower: user._id, status: "accepted" }).populate("following", publicUserFields),
             isAdmin || relationship === "self" ? Follow.find({ following: user._id, status: "pending" }).populate("follower", publicUserFields) : [],
@@ -102,7 +103,8 @@ export const getPublicProfile = async (req, res, next) => {
                     .select("game status updatedAt")
                     .populate("game", "name image genre")
                     .sort({ updatedAt: -1 })
-                : []
+                : [],
+            canViewDetails ? Game.countDocuments() : 0
         ]);
 
         res.status(200).json({
@@ -115,6 +117,7 @@ export const getPublicProfile = async (req, res, next) => {
                 followers: canViewDetails || isAdmin ? followers.map(item => item.follower) : [],
                 following: canViewDetails || isAdmin ? following.map(item => item.following) : [],
                 library: library.filter(item => item.game),
+                totalGames,
                 libraryMessage: canViewDetails ? "" : "Only followers can view this user's library.",
                 pendingRequests,
                 blockedUsers: blockedByUser,
